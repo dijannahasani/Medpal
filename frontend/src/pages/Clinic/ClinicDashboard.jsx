@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getUser, clearAuth } from "../../utils/auth";
 import MobileNavbar from "../../components/MobileNavbar";
@@ -23,6 +24,119 @@ export default function ClinicDashboard() {
     { to: "/clinic/invite-patient", icon: "📧", title: "Fto Pacient", desc: "Dërgo ftesë për verifikim pacientit" },
     { to: "/clinic/profile", icon: "⚙️", title: "Profili i Klinikës", desc: "Përditëso emrin, emailin ose fjalëkalimin" },
   ];
+  const location = useLocation();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Diagnostic: log any descendants that are sticky/fixed (helps find pinning element)
+    try {
+      setTimeout(() => {
+        const container = containerRef.current || document;
+        const elems = container.querySelectorAll('.clinic-dashboard-grid *');
+        const stuck = [];
+        elems.forEach(el => {
+          try {
+            const style = window.getComputedStyle(el);
+            if (style.position === 'sticky' || style.position === '-webkit-sticky' || style.position === 'fixed') {
+              stuck.push({ tag: el.tagName, cls: el.className, id: el.id, pos: style.position });
+            }
+          } catch (e) {}
+        });
+        if (stuck.length) console.warn('ClinicDashboard: found potentially sticky/fixed elements:', stuck);
+      }, 200);
+    } catch (e) {}
+    // 1) Restore saved scroll position if user previously left the dashboard.
+    const saved = sessionStorage.getItem('clinic_dashboard_scroll');
+    if (saved !== null) {
+      const top = parseFloat(saved);
+      if (!Number.isNaN(top)) {
+        // restore and remove saved value
+        window.scrollTo({ top, left: 0, behavior: 'auto' });
+        sessionStorage.removeItem('clinic_dashboard_scroll');
+        return; // done
+      }
+    }
+
+    // 2) If navigation provided a cardIndex, prefer that for deterministic scrolling
+    const state = location && location.state;
+    if (state && typeof state.cardIndex === 'number') {
+      try {
+        const container = containerRef.current || document;
+        const el = container.querySelector(`[data-index="${state.cardIndex}"]`);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.pageYOffset - 72; // small offset
+          window.scrollTo({ top, left: 0, behavior: 'auto' });
+          return;
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // 3) If navigation provided a sourcePath, try to scroll to the matching card deterministically
+    if (state && state.sourcePath) {
+      try {
+        const matchIndex = cards.findIndex(c => {
+          // exact match or prefix match
+          return state.sourcePath === c.to || state.sourcePath.startsWith(c.to) || c.to.startsWith(state.sourcePath);
+        });
+        if (matchIndex >= 0) {
+          const container = containerRef.current || document;
+          const el = container.querySelector(`[data-index="${matchIndex}"]`);
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.pageYOffset - 72; // small offset
+            window.scrollTo({ top, left: 0, behavior: 'auto' });
+            return; // done
+          }
+        }
+      } catch (e) {
+        // ignore and fall back to clickY
+      }
+    }
+
+  // 4) Fallback: if navigation provided a clickY, try to scroll to the row card nearest that Y
+  if (state && typeof state.clickY === 'number') {
+      // small timeout to allow layout to stabilize after navigation
+      setTimeout(() => {
+        const container = containerRef.current || document;
+        // find all card wrappers
+        const cardWrappers = container.querySelectorAll('.clinic-dashboard-card');
+        if (!cardWrappers || cardWrappers.length === 0) return;
+
+        // compute distances from top of viewport to each card and choose nearest to clickY
+        let bestEl = null;
+        let bestDist = Infinity;
+        cardWrappers.forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          // center Y of the element relative to viewport
+          const centerY = rect.top + rect.height / 2;
+          const dist = Math.abs(centerY - state.clickY);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestEl = el;
+          }
+        });
+
+        if (bestEl) {
+          // scroll so the chosen element is roughly where the user clicked
+          const rect = bestEl.getBoundingClientRect();
+          const offset = rect.top - (state.clickY - rect.height / 2);
+          window.scrollBy({ top: offset, left: 0, behavior: 'auto' });
+        }
+      }, 120);
+    }
+    // no dependency on location to only run on mount after navigation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save scroll position when leaving the dashboard so returning preserves it
+  useEffect(() => {
+    return () => {
+      try {
+        sessionStorage.setItem('clinic_dashboard_scroll', String(window.scrollY || window.pageYOffset || 0));
+      } catch (e) {
+        // ignore storage errors
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -39,7 +153,8 @@ export default function ClinicDashboard() {
         style={{
           backgroundColor: "#FAF7F3", 
           minHeight: "calc(100vh - 64px)", 
-          padding: "1rem 0",
+          paddingTop: "64px", // reserve space for sticky mobile navbar
+          paddingBottom: "1rem",
           background: "linear-gradient(135deg, #FAF7F3 0%, #F0E4D3 50%, #DCC5B2 100%)"
         }}
       >
@@ -75,7 +190,7 @@ export default function ClinicDashboard() {
               }}
             >
               <div className="card-body p-3">
-                <h5 className="card-title mb-2">👋 Mirësevini në Klinikën {user?.name || "Klinika e Re"}!</h5>
+                <h5 className="card-title mb-2 text-white">👋 Mirësevini në Klinikën {user?.name || "Klinika e Re"}!</h5>
                 <p className="card-text mb-0 small">
                   Zgjidhni një nga opsionet më poshtë për të vazhduar
                 </p>
@@ -85,7 +200,7 @@ export default function ClinicDashboard() {
 
         {/* Cards Grid */}
         <div
-          className="d-grid gap-4"
+          className="d-grid gap-4 clinic-dashboard-grid"
           style={{
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           }}
@@ -93,12 +208,14 @@ export default function ClinicDashboard() {
           {cards.map((card, index) => (
             <Link to={card.to} key={index} className="text-decoration-none">
               <div
-                className="card text-start shadow-sm"
+                className="card text-start shadow-sm clinic-dashboard-card"
+                data-index={index}
                 style={{
                   background: "linear-gradient(145deg, #FFFDFC, #F0E4D3)",
                   border: "1px solid rgba(220, 197, 178, 0.3)",
                   borderRadius: "20px",
                   boxShadow: "0 4px 20px rgba(217, 162, 153, 0.2)",
+                  position: 'static', // ensure card does not become sticky
                   transition: "transform 0.25s ease, box-shadow 0.25s ease",
                 }}
                 onMouseEnter={(e) => {

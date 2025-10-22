@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
 
 export default function ClinicSetDoctorHours() {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [doctorDropdownOpen, setDoctorDropdownOpen] = useState(false);
+  const doctorDropdownRef = useRef(null);
+  const [openTimeDropdown, setOpenTimeDropdown] = useState(null); // key: `${day}-start` or `${day}-end`
   const [workingHours, setWorkingHours] = useState({
     monday: { start: "", end: "" },
     tuesday: { start: "", end: "" },
@@ -24,6 +27,52 @@ export default function ClinicSetDoctorHours() {
       .then((res) => setDoctors(res.data))
       .catch((err) => console.error("❌ Gabim në marrjen e mjekëve:", err));
   }, []);
+
+  // Close dropdown on outside click / Escape
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (doctorDropdownRef.current && !doctorDropdownRef.current.contains(e.target)) {
+        setDoctorDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => { if (e.key === 'Escape') setDoctorDropdownOpen(false); };
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
+  // Close time dropdowns on outside click / Escape
+  useEffect(() => {
+    const handleOutsideTimes = (e) => {
+      // if click is outside any element with data-time-dropdown, close
+      const inside = e.target.closest && e.target.closest('[data-time-dropdown]');
+      if (!inside) setOpenTimeDropdown(null);
+    };
+    const handleEscTimes = (e) => { if (e.key === 'Escape') setOpenTimeDropdown(null); };
+    document.addEventListener('click', handleOutsideTimes);
+    document.addEventListener('keydown', handleEscTimes);
+    return () => {
+      document.removeEventListener('click', handleOutsideTimes);
+      document.removeEventListener('keydown', handleEscTimes);
+    };
+  }, []);
+
+  // generate 30-minute interval time slots
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hh = h.toString().padStart(2, '0');
+        const mm = m.toString().padStart(2, '0');
+        slots.push(`${hh}:${mm}`);
+      }
+    }
+    return slots;
+  };
+  const timeSlots = generateTimeSlots();
 
   const handleChange = (day, field, value) => {
     setWorkingHours((prev) => ({
@@ -90,61 +139,134 @@ export default function ClinicSetDoctorHours() {
               </div>
               <div className="card-body p-5">
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
+                  <div className="mb-4" style={{ position: 'relative' }} ref={doctorDropdownRef}>
                     <label className="form-label fw-bold" style={{ color: "#D9A299", fontSize: "1.1rem" }}>Zgjedh Mjekun</label>
-                    <select
-                      value={selectedDoctor}
-                      onChange={(e) => setSelectedDoctor(e.target.value)}
-                      className="form-select form-select-lg"
-                      required
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="listbox"
+                      aria-expanded={doctorDropdownOpen}
+                      onClick={() => setDoctorDropdownOpen((s) => !s)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setDoctorDropdownOpen((s) => !s); }}
                       style={{
                         border: "2px solid rgba(220, 197, 178, 0.3)",
                         borderRadius: "12px",
-                        padding: "0.75rem 1rem"
+                        padding: "0.75rem 1rem",
+                        background: 'white',
+                        color: '#2c3e50',
+                        fontSize: '1rem',
+                        minHeight: '48px',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer'
                       }}
                     >
-                      <option value="">Zgjedh Mjekun</option>
-                      {doctors.map((doc) => (
-                        <option key={doc._id} value={doc._id}>
-                          {doc.name}
-                        </option>
-                      ))}
-                    </select>
+                      {selectedDoctor ? (doctors.find(d => d._id === selectedDoctor)?.name || 'Zgjedh Mjekun') : 'Zgjedh Mjekun'}
+                    </div>
+
+                    {doctorDropdownOpen && (
+                      <ul
+                        role="listbox"
+                        tabIndex={-1}
+                        style={{
+                          position: 'absolute',
+                          zIndex: 2000,
+                          left: 0,
+                          right: 0,
+                          marginTop: '8px',
+                          maxHeight: '220px',
+                          overflowY: 'auto',
+                          background: 'white',
+                          border: '1px solid rgba(0,0,0,0.08)',
+                          borderRadius: '8px',
+                          boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                          padding: 0,
+                          listStyle: 'none'
+                        }}
+                      >
+                        <li
+                          role="option"
+                          aria-selected={!selectedDoctor}
+                          onClick={() => { setSelectedDoctor(''); setDoctorDropdownOpen(false); }}
+                          style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                        >
+                          Zgjedh Mjekun
+                        </li>
+                        {doctors.map((doc) => (
+                          <li
+                            key={doc._id}
+                            role="option"
+                            aria-selected={selectedDoctor === doc._id}
+                            onClick={() => { setSelectedDoctor(doc._id); setDoctorDropdownOpen(false); }}
+                            style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                          >
+                            {doc.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
                   {Object.entries(workingHours).map(([day, hours]) => (
                     <div key={day} className="mb-4" style={{
                       background: "linear-gradient(145deg, #FAF7F3, #F0E4D3)",
-                      padding: "1.5rem",
-                      borderRadius: "15px",
-                      boxShadow: "0 4px 15px rgba(217, 162, 153, 0.1)",
-                      border: "1px solid rgba(220, 197, 178, 0.3)"
+                      padding: "1rem",
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 12px rgba(217, 162, 153, 0.08)",
+                      border: "1px solid rgba(220, 197, 178, 0.25)"
                     }}>
-                      <label className="form-label fw-bold mb-3" style={{ color: "#D9A299", fontSize: "1.1rem" }}>{dayLabels[day]}:</label>
-                      <div className="d-flex gap-3 align-items-center">
-                        <input
-                          type="time"
-                          value={hours.start}
-                          onChange={(e) => handleChange(day, "start", e.target.value)}
-                          className="form-control form-control-lg"
-                          style={{
-                            border: "2px solid rgba(220, 197, 178, 0.3)",
-                            borderRadius: "12px",
-                            padding: "0.75rem 1rem"
-                          }}
-                        />
-                        <span className="fw-bold" style={{ color: "#D9A299", fontSize: "1.1rem" }}>deri</span>
-                        <input
-                          type="time"
-                          value={hours.end}
-                          onChange={(e) => handleChange(day, "end", e.target.value)}
-                          className="form-control form-control-lg"
-                          style={{
-                            border: "2px solid rgba(220, 197, 178, 0.3)",
-                            borderRadius: "12px",
-                            padding: "0.75rem 1rem"
-                          }}
-                        />
+                      <label className="form-label fw-bold mb-2" style={{ color: "#D9A299", fontSize: "1.05rem" }}>{dayLabels[day]}:</label>
+                      <div className="d-flex gap-2 align-items-center flex-wrap">
+                        <div style={{ position: 'relative' }} data-time-dropdown>
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setOpenTimeDropdown(`${day}-start`)}
+                            style={{
+                              border: "2px solid rgba(220, 197, 178, 0.3)",
+                              borderRadius: "10px",
+                              padding: "0.4rem 0.6rem",
+                              minWidth: '120px',
+                              background: 'white',
+                              color: '#2c3e50',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {hours.start || '--:--'}
+                          </div>
+                          {openTimeDropdown === `${day}-start` && (
+                            <ul style={{ position: 'absolute', left: 0, right: 0, marginTop: 6, maxHeight: 200, overflowY: 'auto', background: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 8, padding: 0, zIndex: 3000 }}>
+                              {timeSlots.map(ts => (
+                                <li key={ts} onClick={() => { handleChange(day, 'start', ts); setOpenTimeDropdown(null); }} style={{ padding: '8px 10px', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>{ts}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <span className="fw-bold" style={{ color: "#D9A299", fontSize: "1rem" }}>deri</span>
+                        <div style={{ position: 'relative' }} data-time-dropdown>
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setOpenTimeDropdown(`${day}-end`)}
+                            style={{
+                              border: "2px solid rgba(220, 197, 178, 0.3)",
+                              borderRadius: "10px",
+                              padding: "0.4rem 0.6rem",
+                              minWidth: '120px',
+                              background: 'white',
+                              color: '#2c3e50',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {hours.end || '--:--'}
+                          </div>
+                          {openTimeDropdown === `${day}-end` && (
+                            <ul style={{ position: 'absolute', left: 0, right: 0, marginTop: 6, maxHeight: 200, overflowY: 'auto', background: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 8, padding: 0, zIndex: 3000 }}>
+                              {timeSlots.map(ts => (
+                                <li key={ts} onClick={() => { handleChange(day, 'end', ts); setOpenTimeDropdown(null); }} style={{ padding: '8px 10px', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,0.04)' }}>{ts}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

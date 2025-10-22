@@ -1,11 +1,13 @@
 // src/pages/Doctor/AddVisitReport.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Form, Button, Alert, Card, Spinner } from "react-bootstrap";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
 
 export default function AddVisitReport() {
   const [appointments, setAppointments] = useState([]);
+  const [appointmentDropdownOpen, setAppointmentDropdownOpen] = useState(false);
+  const appointmentDropdownRef = useRef(null);
   const [form, setForm] = useState({
     appointmentId: "",
     diagnosis: "",
@@ -29,6 +31,22 @@ export default function AddVisitReport() {
         console.error("❌ Gabim në marrjen e termineve:", err);
       }
     })();
+  }, []);
+
+  // Close appointment dropdown on outside click or Escape
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (appointmentDropdownRef.current && !appointmentDropdownRef.current.contains(e.target)) {
+        setAppointmentDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => { if (e.key === 'Escape') setAppointmentDropdownOpen(false); };
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -114,39 +132,87 @@ export default function AddVisitReport() {
                   boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)",
                   border: "1px solid rgba(220, 197, 178, 0.3)"
                 }}>
-                  <div className="mb-4">
+                  <div className="mb-4" ref={appointmentDropdownRef} style={{ position: 'relative' }}>
                     <label className="form-label fw-bold" style={{fontSize: "1.1rem" }}>📋 Zgjedh Terminin</label>
-                    <select
-                      name="appointmentId"
-                      className="form-select form-select-lg"
-                      value={form.appointmentId}
-                      onChange={handleChange}
-                      required
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="listbox"
+                      aria-expanded={appointmentDropdownOpen}
+                      onClick={() => setAppointmentDropdownOpen(s => !s)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setAppointmentDropdownOpen(s => !s); }}
+                      style={{
+                        border: "2px solid rgba(220, 197, 178, 0.3)",
+                        borderRadius: "8px",
+                        padding: "0.75rem",
+                        fontSize: "16px",
+                        minHeight: "48px",
+                        background: 'white',
+                        cursor: 'pointer'
+                      }}
                     >
-                      <option value="">Zgjidh</option>
-                      {appointments.map(a => {
-                        // Prefer showing the raw stored values so frontend matches backend exactly.
-                        const rawDate = a.date || "";
-                        const rawTime = a.time || "";
-                        let display = `${a.patientId?.name || 'Pacient'}`;
-                        if (rawDate) display += ` – ${rawDate}`;
-                        if (rawTime) display += ` ${rawTime}`;
+                      {appointments.find(a => a._id === form.appointmentId)
+                        ? (() => {
+                            const a = appointments.find(x => x._id === form.appointmentId);
+                            const rawDate = a?.date || "";
+                            const rawTime = a?.time || "";
+                            let display = `${a?.patientId?.name || 'Pacient'}`;
+                            if (rawDate) display += ` – ${rawDate}`;
+                            if (rawTime) display += ` ${rawTime}`;
+                            return display;
+                          })()
+                        : 'Zgjidh'
+                      }
+                    </div>
 
-                        // Fallback: if both date and time are missing, try parsing an ISO date
-                        if (!rawDate && a.date) {
-                          try {
-                            const dt = new Date(a.date);
-                            if (!isNaN(dt.getTime())) {
-                              display += ` – ${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-                            }
-                          } catch (_) {}
-                        }
-
-                        return (
-                          <option key={a._id} value={a._id}>{display}</option>
-                        );
-                      })}
-                    </select>
+                    {appointmentDropdownOpen && (
+                      <ul
+                        role="listbox"
+                        tabIndex={-1}
+                        style={{
+                          position: 'absolute',
+                          zIndex: 2000,
+                          left: 0,
+                          right: 0,
+                          marginTop: '6px',
+                          maxHeight: '320px',
+                          overflowY: 'auto',
+                          background: 'white',
+                          border: '1px solid rgba(0,0,0,0.08)',
+                          borderRadius: '8px',
+                          boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                          padding: 0,
+                          listStyle: 'none'
+                        }}
+                      >
+                        <li
+                          role="option"
+                          aria-selected={!form.appointmentId}
+                          onClick={() => { setForm(p => ({ ...p, appointmentId: '' })); setAppointmentDropdownOpen(false); }}
+                          style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                        >
+                          Zgjidh
+                        </li>
+                        {appointments.map(a => {
+                          const rawDate = a.date || "";
+                          const rawTime = a.time || "";
+                          let display = `${a.patientId?.name || 'Pacient'}`;
+                          if (rawDate) display += ` – ${rawDate}`;
+                          if (rawTime) display += ` ${rawTime}`;
+                          return (
+                            <li
+                              key={a._id}
+                              role="option"
+                              aria-selected={form.appointmentId === a._id}
+                              onClick={() => { setForm(p => ({ ...p, appointmentId: a._id })); setAppointmentDropdownOpen(false); }}
+                              style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                            >
+                              {display}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </div>
 
                   <div className="mb-4">

@@ -71,7 +71,7 @@ export default function DoctorDashboard() {
               }}
             >
               <div className="card-body p-3">
-                <h5 className="card-title mb-2">👨‍⚕️ Mirësevini Dr. {user?.name || "Mjek"}!</h5>
+                <h5 className="card-title mb-2 text-white">👨‍⚕️ Mirësevini Dr. {user?.name || "Mjek"}!</h5>
                 <p className="card-text mb-0 small">
                   Zgjidhni një nga opsionet më poshtë për të vazhduar
                 </p>

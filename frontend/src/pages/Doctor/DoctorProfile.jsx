@@ -440,22 +440,30 @@ export default function DoctorProfile() {
             {hasActiveSchedule(workingHours) ? (
               <div>
                 {/* Overview Card */}
-                <div className="mb-3 p-3 rounded" style={{
+                <div className="mb-3 rounded" style={{
                   background: "linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(139, 195, 74, 0.1))",
-                  border: "1px solid rgba(76, 175, 80, 0.2)"
+                  border: "1px solid rgba(76, 175, 80, 0.2)",
+                  padding: '0.6rem 0.9rem',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                  overflow: 'visible'
                 }}>
-                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                      <h6 className="mb-1 text-success" style={{ fontSize: "0.9rem" }}>
+                  <div className="d-flex align-items-center" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
+                    {/* Badge moved to the left inside the box */}
+                    <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center' }}>
+                      <span className="badge bg-success" style={{ fontSize: "0.78rem", padding: "0.35rem 0.6rem", display: 'inline-block', marginLeft: 0 }}>
+                        🏥 Në Shërbim
+                      </span>
+                    </div>
+
+                    <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+                      <h6 className="mb-1 text-success" style={{ fontSize: "0.95rem", marginBottom: '0.25rem' }}>
                         ✅ Orari Aktiv
                       </h6>
-                      <small className="text-muted" style={{ fontSize: "0.75rem" }}>
+                      <small className="text-muted" style={{ fontSize: "0.8rem", display: 'block', overflowWrap: 'break-word', whiteSpace: 'normal' }}>
                         {formatDays(workingHours).length} ditë pune të konfiguruara
                       </small>
                     </div>
-                    <span className="badge bg-success" style={{ fontSize: "0.75rem", padding: "0.4rem 0.8rem" }}>
-                      🏥 Në Shërbim
-                    </span>
                   </div>
                 </div>
 

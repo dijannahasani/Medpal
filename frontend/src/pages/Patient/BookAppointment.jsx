@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -14,6 +14,10 @@ export default function BookAppointment() {
   });
 
   const [doctors, setDoctors] = useState([]);
+  const [doctorDropdownOpen, setDoctorDropdownOpen] = useState(false);
+  const doctorDropdownRef = useRef(null);
+  const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
+  const timeDropdownRef = useRef(null);
   const [services, setServices] = useState([]);
   const [workingHours, setWorkingHours] = useState(null);
   const [takenTimes, setTakenTimes] = useState([]);
@@ -32,6 +36,30 @@ export default function BookAppointment() {
       }
     };
     fetchDoctors();
+  }, []);
+
+  // Close dropdown on outside click or Escape
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (doctorDropdownRef.current && !doctorDropdownRef.current.contains(e.target)) {
+        setDoctorDropdownOpen(false);
+      }
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(e.target)) {
+        setTimeDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        setDoctorDropdownOpen(false);
+        setTimeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
   }, []);
 
   const fetchServicesAndHours = async (doctorId) => {
@@ -83,7 +111,23 @@ export default function BookAppointment() {
     const weekday = new Date(form.date).toLocaleDateString("en-US", {
       weekday: "long",
     }).toLowerCase();
-    return workingHours[weekday] || null;
+    const schedule = workingHours[weekday] || null;
+    // Only return a schedule if both start and end are present and non-empty
+    if (!schedule || !schedule.start || !schedule.end) return null;
+    return schedule;
+  };
+
+  const isSelectedDateToday = () => {
+    if (!form.date) return false;
+    try {
+      const selectedDate = new Date(form.date);
+      const today = new Date();
+      const selectedYMD = selectedDate.toISOString().split("T")[0];
+      const todayYMD = today.toISOString().split("T")[0];
+      return selectedYMD === todayYMD;
+    } catch (err) {
+      return false;
+    }
   };
 
   const isTimeAvailable = (time) => !takenTimes.includes(time);
@@ -214,29 +258,73 @@ export default function BookAppointment() {
                 )}
 
                 <form onSubmit={handleSubmit} className="d-grid gap-3">
-                  <div className="form-group">
+                  <div className="form-group" style={{ position: 'relative' }} ref={doctorDropdownRef}>
                     <label className="form-label fw-bold mb-2" style={{ color: "#D9A299", fontSize: "1rem" }}>
                       👨‍⚕️ Zgjedh Mjekun
                     </label>
-                    <select
-                      name="doctorId"
-                      value={form.doctorId}
-                      onChange={handleChange}
-                      className="form-select"
-                      required
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="listbox"
+                      aria-expanded={doctorDropdownOpen}
+                      onClick={() => setDoctorDropdownOpen((s) => !s)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setDoctorDropdownOpen((s) => !s); }}
                       style={{
                         border: "2px solid rgba(220, 197, 178, 0.3)",
                         borderRadius: "8px",
                         padding: "0.75rem",
                         fontSize: "16px",
-                        minHeight: "48px"
+                        minHeight: "48px",
+                        background: 'white',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer'
                       }}
                     >
-                      <option value="">Zgjedh Mjekun</option>
-                      {doctors.map((d) => (
-                        <option key={d._id} value={d._id}>{d.name}</option>
-                      ))}
-                    </select>
+                      {form.doctorId ? (doctors.find(d => d._id === form.doctorId)?.name || 'Zgjedh Mjekun') : 'Zgjedh Mjekun'}
+                    </div>
+
+                    {doctorDropdownOpen && (
+                      <ul
+                        role="listbox"
+                        tabIndex={-1}
+                        style={{
+                          position: 'absolute',
+                          zIndex: 2000,
+                          left: 0,
+                          right: 0,
+                          marginTop: '6px',
+                          maxHeight: '220px',
+                          overflowY: 'auto',
+                          background: 'white',
+                          border: '1px solid rgba(0,0,0,0.08)',
+                          borderRadius: '8px',
+                          boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                          padding: 0,
+                          listStyle: 'none'
+                        }}
+                      >
+                        <li
+                          role="option"
+                          aria-selected={!form.doctorId}
+                          onClick={() => { setForm((p) => ({ ...p, doctorId: '' })); setDoctorDropdownOpen(false); }}
+                          style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                        >
+                          Zgjedh Mjekun
+                        </li>
+                        {doctors.map((d) => (
+                          <li
+                            key={d._id}
+                            role="option"
+                            aria-selected={form.doctorId === d._id}
+                            onClick={async () => { setForm((p) => ({ ...p, doctorId: d._id })); setDoctorDropdownOpen(false); await fetchServicesAndHours(d._id); }}
+                            style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                          >
+                            {d.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
                   <div className="form-group">
@@ -329,7 +417,7 @@ export default function BookAppointment() {
                       🕒 Zgjedh Orën
                     </label>
                     {/* If selected date is today and no times remain, show message */}
-                    {form.date && currentDaySchedule() && timeOptions().length === 0 ? (
+                    {form.date && currentDaySchedule() && isSelectedDateToday() && timeOptions().length === 0 ? (
                       <div className="alert alert-warning" style={{
                         background: "linear-gradient(145deg, #F0E4D3, #DCC5B2)",
                         border: "1px solid rgba(220, 197, 178, 0.3)",
@@ -340,25 +428,69 @@ export default function BookAppointment() {
                         ⚠️ Oraret për sot kanë përfunduar. Ju lutemi zgjidhni një datë tjetër.
                       </div>
                     ) : (
-                      <select
-                        name="time"
-                        value={form.time}
-                        onChange={handleChange}
-                        className="form-select form-select-lg"
-                        required
-                        disabled={!currentDaySchedule() || timeOptions().length === 0}
-                        style={{
-                          border: "2px solid rgba(220, 197, 178, 0.3)",
-                          borderRadius: "12px",
-                          padding: "0.75rem 1rem",
-                          fontSize: "1.1rem"
-                        }}
-                      >
-                        <option value="">Zgjedh Orën</option>
-                        {timeOptions().map((t) => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
+                      <div ref={timeDropdownRef} style={{ position: 'relative' }}>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          aria-haspopup="listbox"
+                          aria-expanded={timeDropdownOpen}
+                          onClick={() => setTimeDropdownOpen(s => !s)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setTimeDropdownOpen(s => !s); }}
+                          style={{
+                            border: "2px solid rgba(220, 197, 178, 0.3)",
+                            borderRadius: "12px",
+                            padding: "0.75rem 1rem",
+                            fontSize: "1.1rem",
+                            minHeight: '48px',
+                            background: 'white',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {form.time || 'Zgjedh Orën'}
+                        </div>
+
+                        {timeDropdownOpen && (
+                          <ul
+                            role="listbox"
+                            tabIndex={-1}
+                            style={{
+                              position: 'absolute',
+                              zIndex: 2000,
+                              left: 0,
+                              right: 0,
+                              marginTop: '6px',
+                              maxHeight: '240px',
+                              overflowY: 'auto',
+                              background: 'white',
+                              border: '1px solid rgba(0,0,0,0.08)',
+                              borderRadius: '8px',
+                              boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                              padding: 0,
+                              listStyle: 'none'
+                            }}
+                          >
+                            <li
+                              role="option"
+                              aria-selected={!form.time}
+                              onClick={() => { setForm(p => ({ ...p, time: '' })); setTimeDropdownOpen(false); }}
+                              style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                            >
+                              Zgjedh Orën
+                            </li>
+                            {timeOptions().map((t) => (
+                              <li
+                                key={t}
+                                role="option"
+                                aria-selected={form.time === t}
+                                onClick={() => { setForm(p => ({ ...p, time: t })); setTimeDropdownOpen(false); }}
+                                style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}
+                              >
+                                {t}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     )}
                   </div>
 

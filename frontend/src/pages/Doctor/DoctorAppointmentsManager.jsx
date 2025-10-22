@@ -139,23 +139,24 @@ export default function DoctorAppointmentsManager() {
                 border: "none"
               }}>
                 <div className="d-flex justify-content-between align-items-center">
-                  <h2 className="card-title mb-0" style={{ fontSize: "2.5rem", fontWeight: "bold", color:"white" }}>
+                  <h2 className="card-title mb-0" style={{ fontSize: "1.6rem", fontWeight: "700", color:"white", lineHeight: 1.1 }}>
                     📋 Menaxhimi i Takimeve
                   </h2>
                   <button 
                     className="btn btn-outline-light btn-lg"
                     onClick={() => window.location.href = '/doctor/profile'}
                     style={{
-                      borderRadius: "12px",
-                      padding: "0.75rem 1.5rem",
-                      fontSize: "1rem",
-                      fontWeight: "bold"
+                      borderRadius: "10px",
+                      padding: "0.4rem 0.9rem",
+                      fontSize: "0.9rem",
+                      fontWeight: "600",
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     ← Kthehu në Profil
                   </button>
                 </div>
-                <p className="mt-2 mb-0" style={{ fontSize: "1.1rem", opacity: "0.9" }}>
+                <p className="mt-2 mb-0" style={{ fontSize: "0.95rem", opacity: "0.95", marginTop: '0.5rem' }}>
                   Menaxhoni të gjitha takimet e pacientëve tuaj
                 </p>
               </div>
@@ -225,9 +226,9 @@ export default function DoctorAppointmentsManager() {
                           }}
                         />
                       </div>
-                      <div className="col-md-2">
+                      <div className="col-md-2 d-flex">
                         <button
-                          className="btn btn-lg w-100"
+                          className="btn btn-sm w-100"
                           onClick={() => {
                             setFilter('all');
                             setSelectedDate('');
@@ -236,8 +237,14 @@ export default function DoctorAppointmentsManager() {
                             background: "linear-gradient(135deg, #DCC5B2, #D9A299)",
                             border: "none",
                             color: "white",
-                            borderRadius: "12px",
-                            boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)"
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 12px rgba(217, 162, 153, 0.25)",
+                            padding: '0.4rem 0.6rem',
+                            alignSelf: 'center',
+                            minWidth: 0, // prevent overflow in flex
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
                           }}
                         >
                           🗑️ Pastro
@@ -409,58 +416,34 @@ export default function DoctorAppointmentsManager() {
 
                 {/* Statistika */}
                 <div className="row mt-4">
-                  <div className="col-md-3">
-                    <div className="card" style={{
-                      background: "linear-gradient(135deg, #F0E4D3, #DCC5B2)",
+                  {(() => {
+                    const statStyleCommon = {
                       border: "1px solid rgba(220, 197, 178, 0.3)",
                       borderRadius: "15px",
-                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)"
-                    }}>
-                      <div className="card-body text-center">
-                        <h4 style={{ color: "#D9A299", fontSize: "2rem" }}>{appointments.filter(a => a.status === 'pending').length}</h4>
-                        <small style={{ color: "#2c3e50", fontSize: "1rem" }}>Në pritje</small>
+                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)",
+                      minHeight: '120px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '1rem'
+                    };
+
+                    return [
+                      { bg: 'linear-gradient(135deg, #F0E4D3, #DCC5B2)', color: '#D9A299', label: 'Në pritje', count: appointments.filter(a => a.status === 'pending').length, smallColor: '#2c3e50' },
+                      { bg: 'linear-gradient(135deg, #D9A299, #DCC5B2)', color: 'white', label: 'Aprovuar', count: appointments.filter(a => a.status === 'approved').length, smallColor: 'white' },
+                      { bg: 'linear-gradient(135deg, #DCC5B2, #F0E4D3)', color: '#D9A299', label: 'Përfunduar', count: appointments.filter(a => a.status === 'completed').length, smallColor: '#2c3e50' },
+                      { bg: 'linear-gradient(135deg, #DCC5B2, #D9A299)', color: 'white', label: 'Anuluar', count: appointments.filter(a => a.status === 'canceled').length, smallColor: 'white' }
+                    ].map((s, idx) => (
+                      <div className="col-md-3" key={idx}>
+                        <div className="card" style={{ ...statStyleCommon, background: s.bg }}>
+                          <div className="card-body text-center" style={{ padding: 0 }}>
+                            <h4 style={{ color: s.color, fontSize: '1.9rem', margin: 0 }}>{s.count}</h4>
+                            <small style={{ color: s.smallColor, fontSize: '0.95rem', display: 'block', marginTop: '0.4rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</small>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card" style={{
-                      background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
-                      border: "1px solid rgba(220, 197, 178, 0.3)",
-                      borderRadius: "15px",
-                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)"
-                    }}>
-                      <div className="card-body text-center">
-                        <h4 style={{ color: "white", fontSize: "2rem" }}>{appointments.filter(a => a.status === 'approved').length}</h4>
-                        <small style={{ color: "white", fontSize: "1rem" }}>Aprovuar</small>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card" style={{
-                      background: "linear-gradient(135deg, #DCC5B2, #F0E4D3)",
-                      border: "1px solid rgba(220, 197, 178, 0.3)",
-                      borderRadius: "15px",
-                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)"
-                    }}>
-                      <div className="card-body text-center">
-                        <h4 style={{ color: "#D9A299", fontSize: "2rem" }}>{appointments.filter(a => a.status === 'completed').length}</h4>
-                        <small style={{ color: "#2c3e50", fontSize: "1rem" }}>Përfunduar</small>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card" style={{
-                      background: "linear-gradient(135deg, #DCC5B2, #D9A299)",
-                      border: "1px solid rgba(220, 197, 178, 0.3)",
-                      borderRadius: "15px",
-                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)"
-                    }}>
-                      <div className="card-body text-center">
-                        <h4 style={{ color: "white", fontSize: "2rem" }}>{appointments.filter(a => a.status === 'canceled').length}</h4>
-                        <small style={{ color: "white", fontSize: "1rem" }}>Anuluar</small>
-                      </div>
-                    </div>
-                  </div>
+                    ));
+                  })()}
                 </div>
               </div>
             </div>

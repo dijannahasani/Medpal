@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
@@ -11,6 +11,8 @@ export default function ClinicPatientReports() {
     to: "",
     doctorId: "",
   });
+  const [doctorDropdownOpen, setDoctorDropdownOpen] = useState(false);
+  const doctorDropdownRef = useRef(null);
 
   const merrRaportet = async () => {
     try {
@@ -44,6 +46,19 @@ export default function ClinicPatientReports() {
   useEffect(() => {
     merrMjeket();
     merrRaportet();
+    // close dropdown on outside click
+    const handleOutside = (e) => {
+      if (doctorDropdownRef.current && !doctorDropdownRef.current.contains(e.target)) {
+        setDoctorDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => { if (e.key === 'Escape') setDoctorDropdownOpen(false); };
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('click', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
   }, []);
 
   const ndryshoFiltrin = (e) => {
@@ -90,7 +105,7 @@ export default function ClinicPatientReports() {
               border: "1px solid rgba(220, 197, 178, 0.3)",
               borderRadius: "25px",
               boxShadow: "0 20px 40px rgba(217, 162, 153, 0.3)",
-              overflow: "hidden"
+              overflow: "visible" // allow dropdowns/popovers to overflow the card
             }}>
               <div className="card-header text-center py-4" style={{
                 background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
@@ -126,8 +141,9 @@ export default function ClinicPatientReports() {
                       style={{
                         border: "2px solid rgba(220, 197, 178, 0.3)",
                         borderRadius: "12px",
-                        padding: "0.75rem 1rem",
-                        color: "transparent",
+                        padding: "0.6rem 0.8rem",
+                        background: 'white',
+                        color: '#2c3e50',
                         textAlign: "center"
                       }}
                     />
@@ -144,34 +160,42 @@ export default function ClinicPatientReports() {
                       style={{
                         border: "2px solid rgba(220, 197, 178, 0.3)",
                         borderRadius: "12px",
-                        padding: "0.75rem 1rem",
-                        color: "transparent",
+                        padding: "0.6rem 0.8rem",
+                        background: 'white',
+                        color: '#2c3e50',
                         textAlign: "center"
                       }}
                     />
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3" ref={doctorDropdownRef} style={{ position: 'relative' }}>
                     <label className="form-label fw-bold" style={{ color: "#D9A299", fontSize: "1.1rem" }}>👨‍⚕️ Mjeku</label>
-                    <select
-                      name="doctorId"
-                      className="form-select form-select-lg"
-                      value={filtrat.doctorId}
-                      onChange={ndryshoFiltrin}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="listbox"
+                      aria-expanded={doctorDropdownOpen}
+                      onClick={() => setDoctorDropdownOpen((s) => !s)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setDoctorDropdownOpen((s) => !s); }}
                       style={{
                         border: "2px solid rgba(220, 197, 178, 0.3)",
                         borderRadius: "12px",
-                        padding: "0.75rem 1rem",
+                        padding: "0.6rem 0.8rem",
                         color: "#2c3e50",
-                        backgroundColor: "#FAF7F3"
+                        background: 'white',
+                        cursor: 'pointer'
                       }}
                     >
-                      <option value="">Të gjithë mjekët</option>
-                      {mjeket.map((mjek) => (
-                        <option key={mjek._id} value={mjek._id}>
-                          {mjek.name}
-                        </option>
-                      ))}
-                    </select>
+                      {filtrat.doctorId ? (mjeket.find(m => m._id === filtrat.doctorId)?.name || 'Zgjidh') : 'Të gjithë mjekët'}
+                    </div>
+
+                    {doctorDropdownOpen && (
+                      <ul role="listbox" tabIndex={-1} style={{ position: 'absolute', left: 0, right: 0, marginTop: 8, maxHeight: 240, overflowY: 'auto', background: 'white', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 8, padding: 0, zIndex: 3000 }}>
+                        <li role="option" aria-selected={!filtrat.doctorId} onClick={() => { setFiltrat({ ...filtrat, doctorId: '' }); setDoctorDropdownOpen(false); }} style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}>Të gjithë mjekët</li>
+                        {mjeket.map(mjek => (
+                          <li key={mjek._id} role="option" aria-selected={filtrat.doctorId === mjek._id} onClick={() => { setFiltrat({ ...filtrat, doctorId: mjek._id }); setDoctorDropdownOpen(false); }} style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}>{mjek.name}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                   <div className="col-md-3 d-flex align-items-end">
                     <button type="submit" className="btn btn-lg w-100" style={{

@@ -42,6 +42,9 @@
   .form-select {
     font-size: 16px !important; /* Prevents zoom on iOS */
     padding: 0.75rem !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
   }
   
   .form-control-lg,
@@ -61,6 +64,103 @@
     padding: 1rem 2rem !important;
     font-size: 1.1rem !important;
     min-height: 48px;
+  }
+
+  /* Clinic Add Doctor tweaks */
+  .clinic-add-title {
+    font-size: 1.6rem !important;
+  }
+
+  .clinic-add-submit {
+    font-size: 1rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* Ensure button content centers and text doesn't overflow */
+  .clinic-add-submit {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    /* allow wrapping so the two-line label can stack */
+    white-space: normal !important;
+    overflow: hidden !important;
+  }
+
+  /* Constrain native select dropdowns so the popup doesn't exceed the card/container */
+  .card .form-select,
+  .card select,
+  .form-select,
+  select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Try to keep option labels from forcing popup wider; browsers vary in support */
+  .card .form-select option,
+  .form-select option,
+  select option {
+    max-width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 0.98rem !important;
+  }
+
+  /* Two-line label for add-doctor button */
+  .btn-line-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-line1 {
+    font-size: 0.9rem !important;
+    background: rgba(255,255,255,0.12);
+    padding: 0.12rem 0.45rem;
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 1;
+  }
+
+  /* Ensure the add button stacks nicely on very small screens */
+  .clinic-add-submit {
+    padding: 0.6rem 0.6rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  /* force column stacking and block labels to guarantee two lines */
+  .clinic-add-submit {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+
+  .btn-line-wrap { width: 100%; }
+  .btn-line1, .btn-line2 {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .btn-line1 {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.12rem !important;
+    padding: 0.08rem 0.4rem !important;
+  }
+
+  .btn-line2 {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    display: block !important;
   }
   
   /* Table mobile adjustments */
@@ -195,4 +295,86 @@
   .btn-lg {
     padding: 0.8rem 1.5rem !important;
   }
+}
+
+/* react-calendar responsive overrides for clinic calendar */
+.clinic-react-calendar {
+  /* constrain width so month grid stays square-ish on mobile */
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.clinic-react-calendar *,
+.clinic-react-calendar *::before,
+.clinic-react-calendar *::after {
+  /* ensure nothing forces vertical text layout */
+  white-space: normal !important;
+  word-break: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+
+.clinic-react-calendar .react-calendar__month-view__weekdays__weekday,
+.clinic-react-calendar .react-calendar__tile {
+  /* keep tile content readable and centered */
+  padding: 6px !important;
+  box-sizing: border-box !important;
+  width: calc(100% / 7) !important; /* make each tile one seventh of the width */
+  min-height: 44px !important;
+  line-height: 1.1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important; /* prevent numbers from breaking */
+}
+
+/* smaller max-width for very small devices */
+@media (max-width: 420px) {
+  .clinic-react-calendar {
+  white-space: nowrap !important; /* prevent numbers from breaking */
+  }
+
+  .clinic-react-calendar .react-calendar__tile {
+    padding: 6px !important;
+    width: calc(100% / 7) !important;
+
+/* Strong grid override: force the month view into 7 equal columns */
+.clinic-react-calendar .react-calendar__month-view__weeks {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 4px !important;
+  align-items: stretch !important;
+}
+
+.clinic-react-calendar .react-calendar__month-view__weekdays {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 4px !important;
+}
+
+.clinic-react-calendar .react-calendar__month-view__weekdays__weekday,
+.clinic-react-calendar .react-calendar__tile {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* If tiles are still getting weird transforms, reset them */
+.clinic-react-calendar .react-calendar__tile * {
+  transform: none !important;
+  rotate: 0 !important;
+}
+    min-height: 40px !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ensure weekday labels don't wrap into vertical characters */
+.clinic-react-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  white-space: nowrap !important;
+  text-transform: none !important;
 }

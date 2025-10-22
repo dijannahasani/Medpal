@@ -434,29 +434,47 @@ export default function ClinicServicesAndDepartments() {
                         <div>
                           {dep.name}
                         </div>
-                        <div>
-                          <button 
-                            className="btn btn-sm me-2" 
-                            onClick={() => handleEditDepartment(dep)} 
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <button
+                            className="btn btn-sm"
+                            onClick={() => handleEditDepartment(dep)}
                             style={{
                               background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                               border: "none",
                               color: "white",
                               borderRadius: "8px",
-                              boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)"
+                              boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)",
+                              width: 42,
+                              height: 42,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 0,
+                              fontSize: '1rem',
+                              lineHeight: 1,
+                              boxSizing: 'border-box'
                             }}
                           >
                             ✏️
                           </button>
-                          <button 
-                            className="btn btn-sm" 
-                            onClick={() => handleDeleteDepartment(dep._id)} 
+                          <button
+                            className="btn btn-sm"
+                            onClick={() => handleDeleteDepartment(dep._id)}
                             style={{
                               background: "linear-gradient(135deg, #DCC5B2, #D9A299)",
                               border: "none",
                               color: "white",
                               borderRadius: "8px",
-                              boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)"
+                              boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)",
+                              width: 42,
+                              height: 42,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 0,
+                              fontSize: '1rem',
+                              lineHeight: 1,
+                              boxSizing: 'border-box'
                             }}
                           >
                             🗑️
@@ -485,22 +503,40 @@ export default function ClinicServicesAndDepartments() {
                         <div>
                           {s.name} – {s.price}€ ({s.departmentId?.name || "-"})
                         </div>
-                        <div>
-                          <button className="btn btn-sm me-2" onClick={() => handleEditService(s)} style={{
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          <button onClick={() => handleEditService(s)} className="btn btn-sm" style={{
                             background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                             border: "none",
                             color: "white",
                             borderRadius: "8px",
-                            boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)"
+                            boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)",
+                            width: 42,
+                            height: 42,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            fontSize: '1rem',
+                            lineHeight: 1,
+                            boxSizing: 'border-box'
                           }}>
                             ✏️
                           </button>
-                          <button className="btn btn-sm" onClick={() => handleDeleteService(s._id)} style={{
+                          <button onClick={() => handleDeleteService(s._id)} className="btn btn-sm" style={{
                             background: "linear-gradient(135deg, #DCC5B2, #D9A299)",
                             border: "none",
                             color: "white",
                             borderRadius: "8px",
-                            boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)"
+                            boxShadow: "0 4px 15px rgba(217, 162, 153, 0.3)",
+                            width: 42,
+                            height: 42,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            fontSize: '1rem',
+                            lineHeight: 1,
+                            boxSizing: 'border-box'
                           }}>
                             🗑️
                           </button>

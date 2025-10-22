@@ -132,15 +132,21 @@ export default function DoctorReports() {
                               background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                               border: "none",
                               color: "white",
-                              borderRadius: "10px",
+                              borderRadius: "8px",
                               boxShadow: "0 6px 18px rgba(217, 162, 153, 0.35)",
-                              padding: "0.5rem 1rem",
-                              fontSize: "0.95rem",
+                              padding: "0.28rem 0.6rem",
+                              fontSize: "0.85rem",
                               fontWeight: "600",
                               transition: "all 0.18s ease",
-                              display: "inline-block",
-                              maxWidth: "100%",
+                              display: "inline-flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: "0.08rem",
+                              whiteSpace: "normal",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
                               boxSizing: "border-box",
+                              maxWidth: "100%",
                             }}
                             onMouseEnter={(e) => {
                               const el = e.currentTarget;
@@ -152,7 +158,9 @@ export default function DoctorReports() {
                               el.style.transform = "translateY(0)";
                               el.style.boxShadow = "0 6px 18px rgba(217, 162, 153, 0.35)";
                             }}>
-                              ⬇️ Shkarko PDF
+                              <span style={{ fontSize: "1rem", lineHeight: 1, display: 'block' }}>⬇️</span>
+                              <span style={{ display: 'block', lineHeight: 1, fontSize: "0.95rem" }}>Shkarko</span>
+                              <span style={{ display: 'block', lineHeight: 1, fontSize: "0.8rem", opacity: 0.95 }}>PDF</span>
                             </button>
                           </div>
                         </div>

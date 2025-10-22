@@ -115,16 +115,42 @@ export default function DoctorWorkingHoursManager() {
   }
 
   return (
-    <div className="container py-5" style={{ maxWidth: "800px" }}>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>🗓️ Menaxhimi i Orarit të Punës</h2>
-        <button 
-          className="btn btn-outline-secondary"
-          onClick={() => window.location.href = '/doctor/profile'}
-        >
-          ← Kthehu në Profil
-        </button>
-      </div>
+    <div className="container-fluid" style={{ 
+      backgroundColor: "#FAF7F3", 
+      minHeight: "100vh", 
+      padding: "2rem 0",
+      background: "linear-gradient(135deg, #FAF7F3 0%, #F0E4D3 50%, #DCC5B2 100%)"
+    }}>
+      <div className="container" style={{ maxWidth: "900px" }}>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 700, margin: 0 }}>🗓️ Menaxhimi i Orarit të Punës</h2>
+          <button 
+            className="btn"
+            onClick={() => window.location.href = '/doctor/profile'}
+            style={{
+              borderRadius: 10,
+              padding: '0.45rem 0.9rem',
+              fontWeight: 600,
+              background: 'white',
+              color: '#2c3e50',
+              border: '1px solid rgba(0,0,0,0.06)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget;
+              el.style.background = 'linear-gradient(135deg, #D9A299, #DCC5B2)';
+              el.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget;
+              el.style.background = 'white';
+              el.style.color = '#2c3e50';
+            }}
+          >
+            ← Kthehu në Profil
+          </button>
+        </div>
 
       {error && (
         <div className="alert alert-warning mb-4">
@@ -132,11 +158,17 @@ export default function DoctorWorkingHoursManager() {
         </div>
       )}
 
-      <div className="card shadow">
-        <div className="card-header bg-primary text-white">
-          <h5 className="mb-0">Cakto Orarin Tuaj të Punës</h5>
-        </div>
-        <div className="card-body">
+        <div className="card shadow-lg" style={{
+          background: "linear-gradient(145deg, #FAF7F3, #F0E4D3)",
+          border: "1px solid rgba(220, 197, 178, 0.3)",
+          borderRadius: "20px",
+          boxShadow: "0 20px 40px rgba(217, 162, 153, 0.3)",
+          overflow: 'hidden'
+        }}>
+          <div className="card-header text-white" style={{ background: 'linear-gradient(135deg, #D9A299, #DCC5B2)', border: 'none' }}>
+            <h5 className="mb-0" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Cakto Orarin Tuaj të Punës</h5>
+          </div>
+          <div className="card-body p-4">
           <div className="row">
             {Object.entries(workingHours).map(([day, hours]) => (
               <div key={day} className="col-md-6 mb-4">
@@ -193,7 +225,7 @@ export default function DoctorWorkingHoursManager() {
             ))}
           </div>
 
-          <div className="mt-4 pt-3 border-top">
+          <div className="mt-4 pt-3 border-top" style={{ borderColor: 'rgba(220, 197, 178, 0.25)' }}>
             <div className="d-flex justify-content-between">
               <button
                 className="btn btn-outline-secondary"
@@ -230,18 +262,19 @@ export default function DoctorWorkingHoursManager() {
         </div>
       </div>
 
-      <div className="card mt-4">
-        <div className="card-body">
-          <h6 className="text-primary">💡 Shënime:</h6>
-          <ul className="mb-0 small text-muted">
+        <div className="card mt-4" style={{ background: 'linear-gradient(145deg, #FAF7F3, #F0E4D3)', border: '1px solid rgba(220, 197, 178, 0.3)', borderRadius: 15 }}>
+          <div className="card-body">
+            <h6 className="text-primary">💡 Shënime:</h6>
+            <ul className="mb-0 small text-muted">
             <li>Aktivizo/çaktivizo ditët sipas nevojës</li>
             <li>Cakto kohën e fillimit dhe mbarimit për çdo ditë</li>
             <li>Pacientët do të mund të rezervojnë takime vetëm në oraret aktive</li>
             <li>Ndryshimet do të zbatohen menjëherë pas ruajtjes</li>
           </ul>
         </div>
+        </div>
+        <DoctorHomeButton />
       </div>
-      <DoctorHomeButton />
     </div>
   );
 }

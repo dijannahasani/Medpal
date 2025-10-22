@@ -701,3 +701,24 @@ body {
   top: auto !important;
   z-index: auto !important;
 }
+
+/* --------------------------------------------------
+   Clinic dashboard: ensure no card or card-child becomes sticky
+   This avoids specific cards (like 'Raportet') pinning to the top.
+   Scoped so it doesn't affect other pages that may intentionally use sticky.
+-------------------------------------------------- */
+.clinic-dashboard-grid .clinic-dashboard-card,
+.clinic-dashboard-grid .clinic-dashboard-card * {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+}
+
+/* Debug stronger override: in case some third-party CSS injects sticky/fixed, force everything inside the grid to be non-sticky
+   (temporary - remove after debugging) */
+.clinic-dashboard-grid, .clinic-dashboard-grid * {
+  position: static !important;
+  top: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+}

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import PrivateRoute from "./components/PrivateRoute";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/MobileResponsive.css';
+import './styles/Mobile.css';
 import './styles/Dashboard.css';
 
 import WelcomePage from "./pages/WelcomePage";

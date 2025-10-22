@@ -108,12 +108,12 @@ export default function ClinicAddDoctor() {
               boxShadow: "0 20px 40px rgba(217, 162, 153, 0.3)",
               overflow: "hidden"
             }}>
-              <div className="card-header text-center py-4" style={{
+                <div className="card-header text-center py-4" style={{
                 background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                 color: "white",
                 border: "none"
               }}>
-                <h2 className="card-title mb-0" style={{ fontSize: "2.5rem", fontWeight: "bold", color: "white" }}>
+                <h2 className="card-title mb-0 clinic-add-title" style={{ fontSize: "2.5rem", fontWeight: "bold", color: "white" }}>
                   ➕ Shto Mjek të Ri
                 </h2>
                 <p className="mt-2 mb-0" style={{ fontSize: "1.1rem", opacity: "0.9" }}>
@@ -257,16 +257,19 @@ export default function ClinicAddDoctor() {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-lg w-100" style={{
+                  <button type="submit" className="btn btn-lg w-100 clinic-add-submit" style={{
                     background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                     border: "none",
                     color: "white",
                     borderRadius: "15px",
                     boxShadow: "0 8px 25px rgba(217, 162, 153, 0.4)",
-                    padding: "1rem 2rem",
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    transition: "all 0.3s ease"
+                    padding: "0.6rem 0.9rem",
+                    fontSize: "1rem",
+                    fontWeight: "700",
+                    transition: "all 0.3s ease",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.transform = "translateY(-2px)";
@@ -275,8 +278,12 @@ export default function ClinicAddDoctor() {
                   onMouseLeave={(e) => {
                     e.target.style.transform = "translateY(0)";
                     e.target.style.boxShadow = "0 8px 25px rgba(217, 162, 153, 0.4)";
-                  }}>
-                    ➕ Shto Mjekun
+                    }}>
+                    {/* Use inline styles on the label spans to ensure they take effect even if external CSS overrides exist. */}
+                    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, whiteSpace: 'normal', textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: '1.05rem', lineHeight: '1.05rem', padding: '0', margin: '0' }}>➕ Shto</span>
+                      <span style={{ display: 'block', fontSize: '0.95rem', lineHeight: '1rem', marginTop: '2px' }}>Mjekun</span>
+                    </span>
                   </button>
                 </form>
               </div>

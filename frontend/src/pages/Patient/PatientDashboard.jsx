@@ -32,7 +32,7 @@ export default function PatientDashboard() {
 
   const handleLogout = () => {
     clearAuth();
-    navigate("/");
+    navigate("/login");
   };
 
   const cards = [

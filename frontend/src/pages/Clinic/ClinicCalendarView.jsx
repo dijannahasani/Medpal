@@ -31,20 +31,24 @@ export default function ClinicCalendarView() {
     if (view === "month") {
       const formatted = date.toISOString().split("T")[0];
       const found = appointments.find(a => a.date === formatted);
-      if (found) {
-        return (
-          <div
-            style={{
-              backgroundColor: "#28a745",
-              borderRadius: "50%",
-              width: "8px",
-              height: "8px",
-              margin: "auto",
-              marginTop: "2px",
-            }}
-          />
-        );
-      }
+      const dayNumber = date.getDate();
+      // Render our own tile content (day number + optional dot) so we control wrapping
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <div style={{ fontSize: '0.95rem', whiteSpace: 'nowrap', lineHeight: 1 }}>{dayNumber}</div>
+          {found && (
+            <div
+              style={{
+                backgroundColor: "#28a745",
+                borderRadius: "50%",
+                width: "8px",
+                height: "8px",
+                marginTop: "4px",
+              }}
+            />
+          )}
+        </div>
+      );
     }
     return null;
   };
@@ -82,20 +86,60 @@ export default function ClinicCalendarView() {
 
                 <div className="mb-4" style={{
                   background: "linear-gradient(145deg, #FAF7F3, #F0E4D3)",
-                  padding: "2rem",
+                  padding: "1rem",
                   borderRadius: "20px",
                   boxShadow: "0 8px 25px rgba(217, 162, 153, 0.2)",
                   border: "1px solid rgba(220, 197, 178, 0.3)"
                 }}>
-                  <Calendar
-                    value={date}
-                    onChange={setDate}
-                    tileContent={tileContent}
-                    className="w-100 border rounded shadow-sm"
-                    style={{
-                      fontSize: "1.1rem"
-                    }}
-                  />
+                  {/* Inline overrides placed here so they load immediately before the Calendar element and win over other CSS */}
+                  <style>{`
+                    /* hide react-calendar's default abbreviations/time elements so our tileContent is used */
+                    .clinic-react-calendar .react-calendar__tile abbr,
+                    .clinic-react-calendar .react-calendar__tile time,
+                    .clinic-react-calendar .react-calendar__month-view__weekdays__weekday abbr {
+                      display: none !important;
+                      visibility: hidden !important;
+                      height: 0 !important;
+                      line-height: 0 !important;
+                      margin: 0 !important;
+                      padding: 0 !important;
+                    }
+                    /* force a strict 7-column grid */
+                    .clinic-react-calendar .react-calendar__month-view__weeks {
+                      display: grid !important;
+                      grid-template-columns: repeat(7, 1fr) !important;
+                      gap: 4px !important;
+                    }
+                    .clinic-react-calendar .react-calendar__month-view__weekdays {
+                      display: grid !important;
+                      grid-template-columns: repeat(7, 1fr) !important;
+                      gap: 4px !important;
+                    }
+                    .clinic-react-calendar .react-calendar__tile {
+                      display: flex !important;
+                      align-items: center !important;
+                      justify-content: center !important;
+                      white-space: nowrap !important;
+                      writing-mode: horizontal-tb !important;
+                      box-sizing: border-box !important;
+                      padding: 6px !important;
+                    }
+                  `}</style>
+                  {/* responsive wrapper for calendar */}
+                  <div className="clinic-calendar-wrapper" style={{ width: '100%', display: 'block' }}>
+                    <Calendar
+                      value={date}
+                      onChange={setDate}
+                      tileContent={tileContent}
+                      className="clinic-react-calendar w-100 border rounded shadow-sm"
+                      style={{
+                        width: '100%',
+                        maxWidth: '100%',
+                        margin: '0',
+                        fontSize: '1.05rem'
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <h5 className="mt-3 text-center mb-4" style={{ color: "#D9A299", fontSize: "1.3rem" }}>
