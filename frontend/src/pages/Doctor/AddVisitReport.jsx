@@ -124,11 +124,28 @@ export default function AddVisitReport() {
                       required
                     >
                       <option value="">Zgjidh</option>
-                      {appointments.map(a => (
-                        <option key={a._id} value={a._id}>
-                          {a.patientId?.name} – {a.date} {a.time}
-                        </option>
-                      ))}
+                      {appointments.map(a => {
+                        // Prefer showing the raw stored values so frontend matches backend exactly.
+                        const rawDate = a.date || "";
+                        const rawTime = a.time || "";
+                        let display = `${a.patientId?.name || 'Pacient'}`;
+                        if (rawDate) display += ` – ${rawDate}`;
+                        if (rawTime) display += ` ${rawTime}`;
+
+                        // Fallback: if both date and time are missing, try parsing an ISO date
+                        if (!rawDate && a.date) {
+                          try {
+                            const dt = new Date(a.date);
+                            if (!isNaN(dt.getTime())) {
+                              display += ` – ${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            }
+                          } catch (_) {}
+                        }
+
+                        return (
+                          <option key={a._id} value={a._id}>{display}</option>
+                        );
+                      })}
                     </select>
                   </div>
 
@@ -191,6 +208,7 @@ export default function AddVisitReport() {
                       value={form.symptoms}
                       onChange={handleChange}
                       placeholder="Listo simptomat"
+                      autoComplete="off"
                     />
                   </div>
 

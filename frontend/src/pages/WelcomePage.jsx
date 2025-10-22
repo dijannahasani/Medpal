@@ -6,10 +6,14 @@ export default function WelcomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // In development keep the welcome page visible so devs can click Kyçu / Regjistrohu.
+    // In production, if a token+user exist, redirect to the user's dashboard automatically.
+    if (import.meta.env.DEV) return; // don't redirect during `npm run dev`
+
     // Check if user is already logged in
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    
+
     if (token && user) {
       try {
         const userData = JSON.parse(user);

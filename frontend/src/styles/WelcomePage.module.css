@@ -9,7 +9,8 @@
 
 .header {
   text-align: center;
-  padding: 3rem 1rem;
+  /* slightly reduced padding so header uses less vertical space */
+  padding: 2rem 1rem;
   background: linear-gradient(135deg, #D9A299, #DCC5B2);
   color: white;
   box-shadow: 0 4px 15px rgba(217, 162, 153, 0.3);

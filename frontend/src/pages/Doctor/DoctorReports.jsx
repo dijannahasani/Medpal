@@ -106,17 +106,24 @@ export default function DoctorReports() {
                         border: "1px solid rgba(220, 197, 178, 0.2)",
                         borderRadius: "10px",
                         padding: "1.5rem",
-                        color: "#2c3e50"
+                        color: "#2c3e50",
+                        position: "relative",
+                        overflow: "visible" // allow shadows to render but keep layout intact
                       }}>
                         <div className="row align-items-center">
-                          <div className="col-md-8">
-                            <p style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>
+                          <div className="col-md-8" style={{
+                            /* ensure long text wraps and doesn't overflow the card */
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                            whiteSpace: 'normal'
+                          }}>
+                            <p style={{ fontSize: "1.1rem", marginBottom: "0.5rem", wordBreak: 'break-word' }}>
                               🧑‍💼 <strong style={{ color: "#D9A299" }}>Pacienti:</strong> {r.patientId?.name}
                             </p>
-                            <p style={{ fontSize: "1rem", marginBottom: "0.5rem" }}>
+                            <p style={{ fontSize: "1rem", marginBottom: "0.5rem", wordBreak: 'break-word' }}>
                               📅 <strong>Data:</strong> {r.appointmentId?.date} &nbsp;&nbsp; ⏰ <strong>Ora:</strong> {r.appointmentId?.time}
                             </p>
-                            <p style={{ fontSize: "1rem", marginBottom: "0" }}>
+                            <p style={{ fontSize: "1rem", marginBottom: "0", wordBreak: 'break-word' }}>
                               📋 <strong>Diagnoza:</strong> {r.diagnosis}
                             </p>
                           </div>
@@ -125,20 +132,25 @@ export default function DoctorReports() {
                               background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
                               border: "none",
                               color: "white",
-                              borderRadius: "12px",
-                              boxShadow: "0 6px 20px rgba(217, 162, 153, 0.4)",
-                              padding: "0.75rem 1.5rem",
-                              fontSize: "1rem",
-                              fontWeight: "bold",
-                              transition: "all 0.3s ease"
+                              borderRadius: "10px",
+                              boxShadow: "0 6px 18px rgba(217, 162, 153, 0.35)",
+                              padding: "0.5rem 1rem",
+                              fontSize: "0.95rem",
+                              fontWeight: "600",
+                              transition: "all 0.18s ease",
+                              display: "inline-block",
+                              maxWidth: "100%",
+                              boxSizing: "border-box",
                             }}
                             onMouseEnter={(e) => {
-                              e.target.style.transform = "translateY(-2px)";
-                              e.target.style.boxShadow = "0 8px 25px rgba(217, 162, 153, 0.5)";
+                              const el = e.currentTarget;
+                              el.style.transform = "translateY(-2px)";
+                              el.style.boxShadow = "0 8px 22px rgba(217, 162, 153, 0.45)";
                             }}
                             onMouseLeave={(e) => {
-                              e.target.style.transform = "translateY(0)";
-                              e.target.style.boxShadow = "0 6px 20px rgba(217, 162, 153, 0.4)";
+                              const el = e.currentTarget;
+                              el.style.transform = "translateY(0)";
+                              el.style.boxShadow = "0 6px 18px rgba(217, 162, 153, 0.35)";
                             }}>
                               ⬇️ Shkarko PDF
                             </button>

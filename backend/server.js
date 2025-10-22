@@ -3,6 +3,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
+const os = require('os');
 
 // ✅ KRIJIMI I APP
 const app = express();
@@ -88,5 +89,44 @@ app.get('/', (req, res) => {
 
 // ✅ START SERVER
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// helper: get first non-internal IPv4 address (for LAN access)
+function getLocalIPv4() {
+  const ifaces = os.networkInterfaces();
+  for (const name of Object.keys(ifaces)) {
+    for (const iface of ifaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return null;
+}
+
+// helper: OSC 8 hyperlink (only enable on terminals that likely support it)
+function osc8Link(url, label) {
+  return `\u001b]8;;${url}\u0007${label}\u001b]8;;\u0007`;
+}
+
+app.listen(PORT, () => {
+  const localUrl = `http://localhost:${PORT}`;
+  const ip = getLocalIPv4();
+  const lanUrl = ip ? `http://${ip}:${PORT}` : null;
+
+  // Print a plain URL (most terminals auto-link http/https)
+  console.log(`🚀 Server running at ${localUrl}`);
+
+  // If we have a LAN address, print it too (useful to touch from another device)
+  if (lanUrl) console.log(`📶 LAN: ${lanUrl}`);
+
+  // If running inside VS Code integrated terminal, try OSC 8 hyperlink for a nicer clickable label.
+  const supportsOsc8 = !!process.env.VSCODE_PID || process.env.TERM_PROGRAM === 'vscode';
+  if (supportsOsc8) {
+    try {
+      console.log(osc8Link(localUrl, `Open ${localUrl}`));
+      if (lanUrl) console.log(osc8Link(lanUrl, `Open ${lanUrl}`));
+    } catch (e) {
+      // ignore if terminal doesn't support it
+    }
+  }
+});
 

@@ -107,6 +107,27 @@ export default function BookAppointment() {
       current.setMinutes(current.getMinutes() + 30);
     }
 
+    // If the selected date is today, filter out times that are earlier than now
+    try {
+      const selectedDate = new Date(form.date);
+      const today = new Date();
+      const selectedYMD = selectedDate.toISOString().split('T')[0];
+      const todayYMD = today.toISOString().split('T')[0];
+      if (selectedYMD === todayYMD) {
+        const nowH = today.getHours();
+        const nowM = today.getMinutes();
+        const nowTotal = nowH * 60 + nowM;
+        const filtered = times.filter(t => {
+          const [h, m] = t.split(":" ).map(Number);
+          return (h * 60 + m) > nowTotal; // only future times
+        });
+        return filtered;
+      }
+    } catch (err) {
+      // if parsing fails, just return the computed times
+      console.error(err);
+    }
+
     return times;
   };
 
@@ -307,25 +328,38 @@ export default function BookAppointment() {
                     <label className="form-label fw-bold mb-2" style={{ color: "#D9A299", fontSize: "1.1rem" }}>
                       🕒 Zgjedh Orën
                     </label>
-                    <select
-                      name="time"
-                      value={form.time}
-                      onChange={handleChange}
-                      className="form-select form-select-lg"
-                      required
-                      disabled={!currentDaySchedule()}
-                      style={{
-                        border: "2px solid rgba(220, 197, 178, 0.3)",
-                        borderRadius: "12px",
-                        padding: "0.75rem 1rem",
-                        fontSize: "1.1rem"
-                      }}
-                    >
-                      <option value="">Zgjedh Orën</option>
-                      {timeOptions().map((t) => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
-                    </select>
+                    {/* If selected date is today and no times remain, show message */}
+                    {form.date && currentDaySchedule() && timeOptions().length === 0 ? (
+                      <div className="alert alert-warning" style={{
+                        background: "linear-gradient(145deg, #F0E4D3, #DCC5B2)",
+                        border: "1px solid rgba(220, 197, 178, 0.3)",
+                        borderRadius: "8px",
+                        color: "#2c3e50",
+                        fontSize: "0.95rem"
+                      }}>
+                        ⚠️ Oraret për sot kanë përfunduar. Ju lutemi zgjidhni një datë tjetër.
+                      </div>
+                    ) : (
+                      <select
+                        name="time"
+                        value={form.time}
+                        onChange={handleChange}
+                        className="form-select form-select-lg"
+                        required
+                        disabled={!currentDaySchedule() || timeOptions().length === 0}
+                        style={{
+                          border: "2px solid rgba(220, 197, 178, 0.3)",
+                          borderRadius: "12px",
+                          padding: "0.75rem 1rem",
+                          fontSize: "1.1rem"
+                        }}
+                      >
+                        <option value="">Zgjedh Orën</option>
+                        {timeOptions().map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   <button
