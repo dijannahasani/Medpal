@@ -43,6 +43,19 @@ export default function ClinicDashboard() {
           } catch (e) {}
         });
         if (stuck.length) console.warn('ClinicDashboard: found potentially sticky/fixed elements:', stuck);
+        // Temporary mitigation: hide any top-pinned element whose text includes "Raportet"
+        try {
+          const all = document.querySelectorAll('body *');
+          all.forEach(el => {
+            try {
+              const cs = window.getComputedStyle(el);
+              if ((cs.position === 'sticky' || cs.position === '-webkit-sticky' || cs.position === 'fixed') && el.innerText && el.innerText.includes && el.innerText.includes('Raportet')) {
+                el.style.display = 'none';
+                console.warn('ClinicDashboard: hid pinned element containing "Raportet" for mitigation', el);
+              }
+            } catch (e) {}
+          });
+        } catch (e) {}
       }, 200);
     } catch (e) {}
     // 1) Restore saved scroll position if user previously left the dashboard.
