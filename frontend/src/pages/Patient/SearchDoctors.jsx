@@ -34,7 +34,7 @@ export default function SearchDoctors() {
   };
 
   return (
-    <div className=`container mt-5" style={{ maxWidth: "800px" }}>
+    <div className="container mt-5" style={{ maxWidth: "800px" }}>
       <h2 className="text-center mb-4">🔎 Kërko Mjekë</h2>
 
       <div className="row g-3 mb-3">

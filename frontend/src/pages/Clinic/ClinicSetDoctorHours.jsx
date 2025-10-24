@@ -92,7 +92,7 @@ export default function ClinicSetDoctorHours() {
         { workingHours },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(`✅ Orari u ruajt me sukses!");
+      alert("✅ Orari u ruajt me sukses!");
     } catch (err) {
       console.error("❌ Gabim në ruajtje:", err);
       alert("❌ Dështoi ruajtja e orarit.");

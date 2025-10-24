@@ -86,7 +86,7 @@ export default function UploadDocuments() {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setMessage(`✅ Dokumenti u fshi me sukses!");
+      setMessage("✅ Dokumenti u fshi me sukses!");
       fetchDocuments(); // Rifresko listën
     } catch (err) {
       console.error("❌ Gabim gjatë fshirjes:", err);

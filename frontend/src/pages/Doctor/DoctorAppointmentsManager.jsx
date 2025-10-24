@@ -59,10 +59,10 @@ export default function DoctorAppointmentsManager() {
             ? { ...apt, status: newStatus }
             : apt
         )
-      );
-      
-      alert(`✅ Statusi i takimit u ndryshua në `${newStatus}"`);
-    } catch (err) {
+        );
+        
+        alert(`✅ Statusi i takimit u ndryshua në "${newStatus}"`);
+      } catch (err) {
       console.error("Gabim në ndryshimin e statusit:", err);
       alert("❌ Gabim në ndryshimin e statusit: " + (err.response?.data?.message || err.message));
     }

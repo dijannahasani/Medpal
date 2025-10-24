@@ -55,7 +55,7 @@ export default function ClinicServicesAndDepartments() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setEditingDepartment(null);
-        alert(`✅ Departamenti u përditësua me sukses!");
+        alert("✅ Departamenti u përditësua me sukses!");
       } else {
         await axios.post(
           `${API_URL}/api/clinic/departments`,
@@ -85,7 +85,7 @@ export default function ClinicServicesAndDepartments() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
-      alert(`✅ Departamenti u fshi me sukses!");
+      alert("✅ Departamenti u fshi me sukses!");
     } catch (err) {
       alert("❌ Gabim gjatë fshirjes së departamentit.");
     }
@@ -147,7 +147,7 @@ export default function ClinicServicesAndDepartments() {
       });
       fetchData();
     } catch (err) {
-      alert(`❌ Gabim gjatë fshirjes së shërbimit.");
+      alert("❌ Gabim gjatë fshirjes së shërbimit.");
     }
   };
 

@@ -112,7 +112,7 @@ export default function AdminDashboard() {
         users: prev.users.map((u) => (u._id === id ? { ...u, isVerified: true } : u)),
       }));
     } catch {
-      alert(`❌ Verifikimi dështoi");
+      alert("❌ Verifikimi dështoi");
     }
   };
 
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
         users: prev.users.filter((u) => u._id !== id),
       }));
     } catch {
-      alert(`❌ Fshirja dështoi");
+      alert("❌ Fshirja dështoi");
     }
   };
 
