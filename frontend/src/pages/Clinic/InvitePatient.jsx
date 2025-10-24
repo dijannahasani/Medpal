@@ -37,7 +37,9 @@ const InvitePatient = () => {
         }
       );
 
-      setMessage(response.data.message);
+      // Show success with credentials for manual sharing
+      const data = response.data;
+      setMessage(`✅ ${data.message}\n\n📧 Email: ${data.email}\n🔑 Password: ${data.password}\n🔗 Link: ${data.link}\n\n⚠️ Kopjo këto kredenciale dhe dërgoja manualisht te pacienti!`);
       setFormData({ name: "", email: "" });
     } catch (err) {
       setError(

@@ -330,9 +330,20 @@ router.post("/invite-patient", verifyToken, async (req, res) => {
 
     const link = `${process.env.CLIENT_URL}/verify-invite?email=${encodeURIComponent(email)}&code=${verificationCode}`;
 
-    await sendVerificationEmail(email, verificationCode, link, name, req.user.name);
+    // Try to send email but don't fail if it doesn't work
+    try {
+      await sendVerificationEmail(email, verificationCode, link, name, req.user.name);
+    } catch (emailError) {
+      console.log("⚠️ Email nuk u dërgua, por pacienti u krijua:", emailError.message);
+    }
 
-    res.status(201).json({ message: "Pacienti u ftua me sukses." });
+    res.status(201).json({ 
+      message: "Pacienti u ftua me sukses.", 
+      email: email,
+      password: password,
+      verificationCode: verificationCode,
+      link: link
+    });
   } catch (err) {
     console.error("❌ Gabim në ftesën e pacientit:", err);
     res.status(500).json({ message: "Gabim gjatë ftesës." });
