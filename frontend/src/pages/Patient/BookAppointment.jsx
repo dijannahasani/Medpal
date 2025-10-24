@@ -197,6 +197,10 @@ export default function BookAppointment() {
         navigate("/patient");
       }, 1500);
     } catch (err) {
+      console.error("❌ Gabim në rezervimin e termin:", err);
+      console.error("❌ Response data:", err.response?.data);
+      console.error("❌ Status:", err.response?.status);
+      
       if (err.response?.status === 409) {
         setSuccessMessage("❌ Ky orar është i zënë për këtë mjek.");
       } else if (err.response?.data?.message) {
@@ -204,7 +208,6 @@ export default function BookAppointment() {
       } else {
         setSuccessMessage("❌ Gabim gjatë rezervimit.");
       }
-      console.error(err);
     }
   };
 
