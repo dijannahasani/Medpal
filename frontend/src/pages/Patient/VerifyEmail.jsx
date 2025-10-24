@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 const VerifyEmail = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const VerifyEmail = () => {
 
   const handleVerify = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/verify-email", { email, code });
+      const res = await axios.post(`${API_URL}/api/auth/verify-email`, { email, code });
       setMessage(res.data.message);
     } catch (err) {
       setMessage(err.response?.data?.message || "Gabim gjatë verifikimit.");
