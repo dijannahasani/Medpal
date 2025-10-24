@@ -11,6 +11,10 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: process.env.EMAIL_REJECT_UNAUTHORIZED === "true",
   },
+  // Add timeout to prevent hanging
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 5000,    // 5 seconds
+  socketTimeout: 10000,     // 10 seconds
 });
 
 async function sendAppointmentNotification(to, subject, htmlContent) {
@@ -37,6 +41,7 @@ async function sendAppointmentNotification(to, subject, htmlContent) {
     return true;
   } catch (err) {
     console.error("❌ Failed to send appointment email:", err.message || err);
+    console.warn("⚠️ Email sending failed, but appointment was still created successfully");
     return false; // Do not throw; callers shouldn't fail booking on email issues
   }
 }
