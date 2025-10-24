@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function ClinicProfileUpdate() {
   const [form, setForm] = useState({ name: "", email: "" });
@@ -26,7 +27,7 @@ export default function ClinicProfileUpdate() {
     });
 
     try {
-      const res = await axios.put("http://localhost:5000/api/clinic/update", form, {
+      const res = await axios.put(`${API_URL}/api/clinic/update`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

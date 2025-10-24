@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getToken } from "../../utils/auth";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function ClinicAddDoctor() {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ export default function ClinicAddDoctor() {
     console.log("🔍 Loading departments and services...");
 
     axios
-      .get("http://localhost:5000/api/clinic/departments", {
+      .get(`${API_URL}/api/clinic/departments`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -34,7 +35,7 @@ export default function ClinicAddDoctor() {
       });
 
     axios
-      .get("http://localhost:5000/api/clinic/services", {
+      .get(`${API_URL}/api/clinic/services`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -73,7 +74,7 @@ export default function ClinicAddDoctor() {
     const token = getToken();
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register-doctor", formData, {
+      await axios.post(`${API_URL}/api/auth/register-doctor`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

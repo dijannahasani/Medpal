@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../config/api";
 
 export default function AdminOverview() {
   const [stats, setStats] = useState(null);
@@ -9,7 +10,7 @@ export default function AdminOverview() {
     const fetchOverview = async () => {
       try {
         const token = localStorage.getItem("token"); // ose adminToken, varësisht si e ruan
-        const res = await axios.get("http://localhost:5000/api/admin/overview", {
+        const res = await axios.get(`${API_URL}/api/admin/overview`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(res.data);

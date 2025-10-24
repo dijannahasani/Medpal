@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorWorkingHoursManager() {
   const [workingHours, setWorkingHours] = useState({
@@ -38,7 +39,7 @@ export default function DoctorWorkingHoursManager() {
       const token = localStorage.getItem("token");
       
       const response = await axios.get(
-        "http://localhost:5000/api/working-hours/me",
+        `${API_URL}/api/working-hours/me`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -71,7 +72,7 @@ export default function DoctorWorkingHoursManager() {
       const token = localStorage.getItem("token");
       
       const response = await axios.post(
-        "http://localhost:5000/api/working-hours",
+        `${API_URL}/api/working-hours`,
         { workingHours },
         {
           headers: { Authorization: `Bearer ${token}` }

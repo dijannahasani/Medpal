@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
+import API_URL from "../config/api";
 
 import {
   Chart as ChartJS,
@@ -24,7 +25,7 @@ export default function UserGrowthChart() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/admin/stats/monthly-users", {
+        const res = await axios.get(`${API_URL}/api/admin/stats/monthly-users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

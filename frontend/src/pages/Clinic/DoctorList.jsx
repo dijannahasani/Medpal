@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getToken } from "../../utils/auth";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorList() {
   const [doctors, setDoctors] = useState([]);
@@ -24,7 +25,7 @@ export default function DoctorList() {
   const fetchDoctors = async () => {
     try {
       const token = getToken();
-      const res = await axios.get("http://localhost:5000/api/clinic/doctors", {
+      const res = await axios.get(`${API_URL}/api/clinic/doctors`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDoctors(res.data);
@@ -36,7 +37,7 @@ export default function DoctorList() {
   const fetchDepartments = async () => {
     try {
       const token = getToken();
-      const res = await axios.get("http://localhost:5000/api/clinic/departments", {
+      const res = await axios.get(`${API_URL}/api/clinic/departments`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDepartments(res.data);
@@ -48,7 +49,7 @@ export default function DoctorList() {
   const fetchServices = async () => {
     try {
       const token = getToken();
-      const res = await axios.get("http://localhost:5000/api/clinic/services", {
+      const res = await axios.get(`${API_URL}/api/clinic/services`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setClinicServices(res.data);
@@ -61,12 +62,12 @@ export default function DoctorList() {
     if (!window.confirm("A jeni të sigurt që doni ta fshini mjekun?")) return;
     try {
       const token = getToken();
-      await axios.delete(`http://localhost:5000/api/clinic/doctors/${id}`, {
+      await axios.delete(`${API_URL}/api/clinic/doctors/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchDoctors();
     } catch (err) {
-      console.error("❌ Gabim gjatë fshirjes:", err);
+      console.error(`❌ Gabim gjatë fshirjes:", err);
     }
   };
 
@@ -92,14 +93,14 @@ export default function DoctorList() {
 
       // Emri & emaili
       await axios.put(
-        `http://localhost:5000/api/clinic/users/${id}`,
+        `${API_URL}/api/clinic/users/${id}`,
         { name: editedName, email: editedEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Departamenti & shërbimet
       await axios.put(
-        `http://localhost:5000/api/clinic/doctors/${id}`,
+        `${API_URL}/api/clinic/doctors/${id}`,
         { departmentId: editedDepartmentId, services: editedServices },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -107,7 +108,7 @@ export default function DoctorList() {
       setEditingDoctor(null);
       fetchDoctors();
     } catch (err) {
-      console.error("❌ Gabim gjatë ruajtjes së mjekut:", err);
+      console.error(`❌ Gabim gjatë ruajtjes së mjekut:", err);
     }
   };
 

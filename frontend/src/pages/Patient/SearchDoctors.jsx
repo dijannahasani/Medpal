@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function SearchDoctors() {
   const [doctors, setDoctors] = useState([]);
@@ -17,8 +18,8 @@ export default function SearchDoctors() {
   useEffect(() => {
     const fetchFilters = async () => {
       const [depRes, servRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/departments"),
-        axios.get("http://localhost:5000/api/services"),
+        axios.get(`${API_URL}/api/departments`),
+        axios.get(`${API_URL}/api/services`),
       ]);
       setDepartments(depRes.data);
       setServices(servRes.data);
@@ -28,12 +29,12 @@ export default function SearchDoctors() {
 
   const handleSearch = async () => {
     const params = new URLSearchParams(filters).toString();
-    const res = await axios.get(`http://localhost:5000/api/doctors/search?${params}`);
+    const res = await axios.get(`${API_URL}/api/doctors/search?${params}`);
     setDoctors(res.data);
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "800px" }}>
+    <div className=`container mt-5" style={{ maxWidth: "800px" }}>
       <h2 className="text-center mb-4">🔎 Kërko Mjekë</h2>
 
       <div className="row g-3 mb-3">

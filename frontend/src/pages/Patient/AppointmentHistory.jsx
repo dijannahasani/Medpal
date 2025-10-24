@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MobileNavbar from "../../components/MobileNavbar";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function AppointmentHistory() {
   const [appointments, setAppointments] = useState([]);
@@ -11,7 +12,7 @@ export default function AppointmentHistory() {
     const fetchAppointments = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("http://localhost:5000/api/appointments/mine", {
+        const res = await axios.get(`${API_URL}/api/appointments/mine`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAppointments(res.data);

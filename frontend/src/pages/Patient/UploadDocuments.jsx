@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function UploadDocuments() {
   const [documents, setDocuments] = useState([]);
@@ -13,7 +14,7 @@ export default function UploadDocuments() {
   const fetchDocuments = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/documents/mine", {
+      const res = await axios.get(`${API_URL}/api/documents/mine`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDocuments(res.data);
@@ -50,7 +51,7 @@ export default function UploadDocuments() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/documents/upload", formData, {
+      await axios.post(`${API_URL}/api/documents/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -81,11 +82,11 @@ export default function UploadDocuments() {
       setDeleting(documentId);
       const token = localStorage.getItem("token");
       
-      await axios.delete(`http://localhost:5000/api/documents/${documentId}`, {
+      await axios.delete(`${API_URL}/api/documents/${documentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setMessage("✅ Dokumenti u fshi me sukses!");
+      setMessage(`✅ Dokumenti u fshi me sukses!");
       fetchDocuments(); // Rifresko listën
     } catch (err) {
       console.error("❌ Gabim gjatë fshirjes:", err);
@@ -239,7 +240,7 @@ export default function UploadDocuments() {
                           <div className="col-md-4 text-end">
                             <div className="btn-group">
                               <a
-                                href={`http://localhost:5000${doc.fileUrl}`}
+                                href={`${API_URL}${doc.fileUrl}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="btn btn-lg me-2"

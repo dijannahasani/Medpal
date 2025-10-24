@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Form, Button, Alert, Card, Spinner } from "react-bootstrap";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function AddVisitReport() {
   const [appointments, setAppointments] = useState([]);
@@ -23,7 +24,7 @@ export default function AddVisitReport() {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/appointments/doctor", {
+        const res = await axios.get(`${API_URL}/api/appointments/doctor`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAppointments(res.data.filter(a => a.status === "approved"));
@@ -59,7 +60,7 @@ export default function AddVisitReport() {
     setMessage({ text: "", type: "" });
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/reports", form, {
+      await axios.post(`${API_URL}/api/reports`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage({ text: "✅ Raporti u ruajt me sukses!", type: "success" });

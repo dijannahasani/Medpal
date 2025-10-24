@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import UserGrowthChart from "./userGrowthChart";
 import RevenueChart from "./RevenueChart";
+import API_URL from "../config/api";
 
 export default function AdminDashboard() {
   const [data, setData] = useState({ users: [], total: 0, page: 1, pages: 1 });
@@ -28,7 +29,7 @@ export default function AdminDashboard() {
       if (searchTerm) params.search = searchTerm;
       if (role) params.role = role;
 
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const statsRes = await axios.get("http://localhost:5000/api/admin/stats", {
+      const statsRes = await axios.get(`${API_URL}/api/admin/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStats(statsRes.data);
@@ -56,7 +57,7 @@ export default function AdminDashboard() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/admin/profile", {
+      const res = await axios.get(`${API_URL}/api/admin/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
@@ -71,7 +72,7 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:5000/api/admin/profile",
+        `${API_URL}/api/admin/profile`,
         { name: profileName, email: profileEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -102,7 +103,7 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/admin/verify/${id}`,
+        `${API_URL}/api/admin/verify/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -111,7 +112,7 @@ export default function AdminDashboard() {
         users: prev.users.map((u) => (u._id === id ? { ...u, isVerified: true } : u)),
       }));
     } catch {
-      alert("❌ Verifikimi dështoi");
+      alert(`❌ Verifikimi dështoi");
     }
   };
 
@@ -119,7 +120,7 @@ export default function AdminDashboard() {
     if (!window.confirm("A je i sigurt që dëshiron ta fshish këtë përdorues?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/admin/delete/${id}`, {
+      await axios.delete(`${API_URL}/api/admin/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData((prev) => ({
@@ -127,7 +128,7 @@ export default function AdminDashboard() {
         users: prev.users.filter((u) => u._id !== id),
       }));
     } catch {
-      alert("❌ Fshirja dështoi");
+      alert(`❌ Fshirja dështoi");
     }
   };
 

@@ -5,6 +5,7 @@ import { saveAs } from "file-saver";
 import Modal from "react-modal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 Modal.setAppElement("#root");
 
@@ -17,7 +18,7 @@ export default function ClinicAppointments() {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/appointments/all", {
+      const res = await axios.get(`${API_URL}/api/appointments/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAppointments(res.data);
@@ -31,22 +32,22 @@ export default function ClinicAppointments() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/appointments/${appointmentId}/status`,
+        `${API_URL}/api/appointments/${appointmentId}/status`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchAppointments();
     } catch (err) {
-      console.error("❌ Gabim gjatë përditësimit të statusit:", err);
+      console.error(`❌ Gabim gjatë përditësimit të statusit:", err);
     }
   };
 
   const downloadPDF = async (appointmentId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/api/appointments/${appointmentId}/pdf`, {
+      const res = await axios.get(`${API_URL}/api/appointments/${appointmentId}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob",
+        responseType: `blob",
       });
 
       const blob = new Blob([res.data], { type: "application/pdf" });
@@ -80,7 +81,7 @@ export default function ClinicAppointments() {
   };
 
   const openModal = (fileUrl) => {
-    setSelectedDocUrl("http://localhost:5000" + fileUrl);
+    setSelectedDocUrl(`${API_URL}" + fileUrl);
     setModalIsOpen(true);
   };
 

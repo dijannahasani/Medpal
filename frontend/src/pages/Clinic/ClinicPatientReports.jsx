@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function ClinicPatientReports() {
   const [raportet, setRaportet] = useState([]);
@@ -22,19 +23,19 @@ export default function ClinicPatientReports() {
       if (filtrat.to) query.append("to", filtrat.to);
       if (filtrat.doctorId) query.append("doctorId", filtrat.doctorId);
 
-      const res = await axios.get(`http://localhost:5000/api/reports/clinic?${query.toString()}`, {
+      const res = await axios.get(`${API_URL}/api/reports/clinic?${query.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRaportet(res.data);
     } catch (err) {
-      console.error("❌ Gabim në marrjen e raporteve të klinikës:", err);
+      console.error(`❌ Gabim në marrjen e raporteve të klinikës:", err);
     }
   };
 
   const merrMjeket = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/users/doctors", {
+      const res = await axios.get(`${API_URL}/api/users/doctors`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMjeket(res.data);
@@ -73,8 +74,8 @@ export default function ClinicPatientReports() {
   const shkarkoPDF = async (reportId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/api/reports/${reportId}/pdf`, {
-        responseType: "blob",
+      const res = await axios.get(`${API_URL}/api/reports/${reportId}/pdf`, {
+        responseType: `blob",
         headers: { Authorization: `Bearer ${token}` },
       });
 

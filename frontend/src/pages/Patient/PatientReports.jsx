@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function PatientReports() {
   const [reports, setReports] = useState([]);
@@ -10,7 +11,7 @@ export default function PatientReports() {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/reports/me", {
+        const res = await axios.get(`${API_URL}/api/reports/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReports(res.data);
@@ -25,8 +26,8 @@ export default function PatientReports() {
   const handleDownload = async (reportId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/api/reports/${reportId}/pdf`, {
-        responseType: "blob",
+      const res = await axios.get(`${API_URL}/api/reports/${reportId}/pdf`, {
+        responseType: `blob",
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function ClinicSetDoctorHours() {
   const [doctors, setDoctors] = useState([]);
@@ -21,7 +22,7 @@ export default function ClinicSetDoctorHours() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:5000/api/clinic/doctors", {
+      .get(`${API_URL}/api/clinic/doctors`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setDoctors(res.data))
@@ -87,11 +88,11 @@ export default function ClinicSetDoctorHours() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/working-hours/${selectedDoctor}`,
+        `${API_URL}/api/working-hours/${selectedDoctor}`,
         { workingHours },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Orari u ruajt me sukses!");
+      alert(`✅ Orari u ruajt me sukses!");
     } catch (err) {
       console.error("❌ Gabim në ruajtje:", err);
       alert("❌ Dështoi ruajtja e orarit.");

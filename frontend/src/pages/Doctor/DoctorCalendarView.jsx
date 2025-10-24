@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorCalendarView() {
   const [date, setDate] = useState(new Date());
@@ -13,7 +14,7 @@ export default function DoctorCalendarView() {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/appointments/doctor", {
+        const res = await axios.get(`${API_URL}/api/appointments/doctor`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAppointments(res.data);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorAppointments() {
   const [appointments, setAppointments] = useState([]);
@@ -9,7 +10,7 @@ export default function DoctorAppointments() {
   const fetchAppointments = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("http://localhost:5000/api/appointments/doctor", {
+      const res = await axios.get(`${API_URL}/api/appointments/doctor`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAppointments(res.data);
@@ -22,17 +23,17 @@ export default function DoctorAppointments() {
 
   const updateStatus = async (id, status) => {
     const token = localStorage.getItem("token");
-    await axios.put(`http://localhost:5000/api/appointments/${id}/status`, { status }, {
+    await axios.put(`${API_URL}/api/appointments/${id}/status`, { status }, {
       headers: { Authorization: `Bearer ${token}` },
     });
     fetchAppointments();
   };
 
   const downloadPDF = async (id) => {
-    const token = localStorage.getItem("token");
-    const res = await axios.get(`http://localhost:5000/api/appointments/${id}/pdf`, {
+    const token = localStorage.getItem(`token");
+    const res = await axios.get(`${API_URL}/api/appointments/${id}/pdf`, {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: "blob",
+      responseType: `blob",
     });
     const blob = new Blob([res.data], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);

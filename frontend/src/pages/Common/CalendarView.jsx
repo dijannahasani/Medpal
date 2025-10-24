@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import axios from "axios";
+import API_URL from "../../config/api";
 
 export default function CalendarView() {
   const [date, setDate] = useState(new Date());
@@ -11,7 +12,7 @@ export default function CalendarView() {
     const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/appointments/mine", {
+        const res = await axios.get(`${API_URL}/api/appointments/mine`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAppointments(res.data);

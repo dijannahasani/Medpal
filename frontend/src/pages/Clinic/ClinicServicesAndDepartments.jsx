@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getToken } from "../../utils/auth";
 import ClinicHomeButton from "../../components/ClinicHomeButton";
+import API_URL from "../../config/api";
 
 export default function ClinicServicesAndDepartments() {
   const [departmentName, setDepartmentName] = useState("");
@@ -25,10 +26,10 @@ export default function ClinicServicesAndDepartments() {
   const fetchData = async () => {
     try {
       const [depRes, servRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/clinic/departments", {
+        axios.get(`${API_URL}/api/clinic/departments`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:5000/api/clinic/services", {
+        axios.get(`${API_URL}/api/clinic/services`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -49,15 +50,15 @@ export default function ClinicServicesAndDepartments() {
     try {
       if (editingDepartment) {
         await axios.put(
-          `http://localhost:5000/api/clinic/departments/${editingDepartment}`,
+          `${API_URL}/api/clinic/departments/${editingDepartment}`,
           { name: departmentName },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setEditingDepartment(null);
-        alert("✅ Departamenti u përditësua me sukses!");
+        alert(`✅ Departamenti u përditësua me sukses!");
       } else {
         await axios.post(
-          "http://localhost:5000/api/clinic/departments",
+          `${API_URL}/api/clinic/departments`,
           { name: departmentName },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -80,11 +81,11 @@ export default function ClinicServicesAndDepartments() {
   const handleDeleteDepartment = async (id) => {
     if (!window.confirm("A jeni i sigurt që doni ta fshini këtë departament?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/clinic/departments/${id}`, {
+      await axios.delete(`${API_URL}/api/clinic/departments/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
-      alert("✅ Departamenti u fshi me sukses!");
+      alert(`✅ Departamenti u fshi me sukses!");
     } catch (err) {
       alert("❌ Gabim gjatë fshirjes së departamentit.");
     }
@@ -109,14 +110,14 @@ export default function ClinicServicesAndDepartments() {
     try {
       if (editingService) {
         await axios.put(
-          `http://localhost:5000/api/clinic/services/${editingService}`,
+          `${API_URL}/api/clinic/services/${editingService}`,
           { name, price, departmentId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setEditingService(null);
       } else {
         await axios.post(
-          "http://localhost:5000/api/clinic/services",
+          `${API_URL}/api/clinic/services`,
           { name, price, departmentId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -141,12 +142,12 @@ export default function ClinicServicesAndDepartments() {
   const handleDeleteService = async (id) => {
     if (!window.confirm("A jeni i sigurt që doni ta fshini këtë shërbim?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/clinic/services/${id}`, {
+      await axios.delete(`${API_URL}/api/clinic/services/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
     } catch (err) {
-      alert("❌ Gabim gjatë fshirjes së shërbimit.");
+      alert(`❌ Gabim gjatë fshirjes së shërbimit.");
     }
   };
 

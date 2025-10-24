@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorProfile() {
   const [doctor, setDoctor] = useState(null);
@@ -34,7 +35,7 @@ export default function DoctorProfile() {
 
         // Merr të dhënat e mjekut
         const doctorResponse = await axios.get(
-          "http://localhost:5000/api/auth/me",
+          `${API_URL}/api/auth/me`,
           {
             headers: { 
               Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ export default function DoctorProfile() {
         // Merr orarin e punës
         try {
           const hoursResponse = await axios.get(
-            "http://localhost:5000/api/working-hours/me",
+            `${API_URL}/api/working-hours/me`,
             {
               headers: { 
                 Authorization: `Bearer ${token}`,
@@ -114,12 +115,12 @@ export default function DoctorProfile() {
       const token = localStorage.getItem("token");
       
       const response = await axios.put(
-        `http://localhost:5000/api/auth/update-profile`,
+        `${API_URL}/api/auth/update-profile`,
         editForm,
         {
           headers: { 
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
+            `Content-Type": "application/json"
           }
         }
       );

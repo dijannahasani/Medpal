@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DoctorHomeButton from "../../components/DoctorHomeButton";
+import API_URL from "../../config/api";
 
 export default function DoctorAppointmentsManager() {
   const [appointments, setAppointments] = useState([]);
@@ -20,7 +21,7 @@ export default function DoctorAppointmentsManager() {
       const token = localStorage.getItem("token");
       
       const response = await axios.get(
-        "http://localhost:5000/api/appointments/mine",
+        `${API_URL}/api/appointments/mine`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -44,7 +45,7 @@ export default function DoctorAppointmentsManager() {
       console.log("📤 Request data:", requestData);
       
       await axios.put(
-        `http://localhost:5000/api/appointments/${appointmentId}/status`,
+        `${API_URL}/api/appointments/${appointmentId}/status`,
         requestData,
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -60,7 +61,7 @@ export default function DoctorAppointmentsManager() {
         )
       );
       
-      alert(`✅ Statusi i takimit u ndryshua në "${newStatus}"`);
+      alert(`✅ Statusi i takimit u ndryshua në `${newStatus}"`);
     } catch (err) {
       console.error("Gabim në ndryshimin e statusit:", err);
       alert("❌ Gabim në ndryshimin e statusit: " + (err.response?.data?.message || err.message));
