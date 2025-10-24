@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getToken, getUser, setAuth } from "../../utils/auth";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function PatientProfile() {
   const [form, setForm] = useState({
@@ -19,7 +20,7 @@ export default function PatientProfile() {
   useEffect(() => {
     const fetchData = async () => {
       const token = getToken();
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
+      const res = await axios.get(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setForm({ ...form, ...res.data });
@@ -36,7 +37,7 @@ export default function PatientProfile() {
     const token = getToken();
     try {
       console.log("🔍 Updating patient profile:", form);
-      const response = await axios.put("http://localhost:5000/api/users/me", form, {
+      const response = await axios.put(`${API_URL}/api/users/me`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

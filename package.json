@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node backend/server.js",
+    "dev": "concurrently \"cd backend && nodemon server.js\" \"cd frontend && vite\"",
+    "dev:backend": "cd backend && nodemon server.js",
+    "dev:frontend": "cd frontend && vite",
+    "build:frontend": "cd frontend && npm run build"
   },
   "keywords": [],
   "author": "",

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import API_URL from "../../config/api";
 
 export default function Login() {
   const [step, setStep] = useState("select"); // select, login, forgot, reset
@@ -44,12 +45,12 @@ export default function Login() {
     try {
       let res;
       if (role === "doctor") {
-        res = await axios.post("http://localhost:5000/api/auth/login-doctor", {
+        res = await axios.post(`${API_URL}/api/auth/login-doctor`, {
           doctorCode: formData.doctorCode,
           password: formData.password,
         });
       } else {
-        res = await axios.post("http://localhost:5000/api/auth/login", {
+        res = await axios.post(`${API_URL}/api/auth/login`, {
           email: formData.email,
           password: formData.password,
           expectedRole: role,
@@ -79,7 +80,7 @@ export default function Login() {
     setError("");
     setMessage("");
     try {
-      await axios.post("http://localhost:5000/api/auth/forgot-password", {
+      await axios.post(`${API_URL}/api/auth/forgot-password`, {
         email: formData.email,
         role,
       });
@@ -96,7 +97,7 @@ export default function Login() {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:5000/api/auth/reset-password", {
+      await axios.post(`${API_URL}/api/auth/reset-password`, {
         email: formData.email,
         role,
         code: formData.code,

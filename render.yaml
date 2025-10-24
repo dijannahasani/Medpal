@@ -1,0 +1,40 @@
+# Render Blueprint for MedPal Backend
+# This file allows you to deploy the backend with one click
+
+services:
+  - type: web
+    name: medpal-backend
+    runtime: node
+    region: oregon # Change to your preferred region
+    plan: free # Change to 'starter' or higher for production
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: backend
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false # Set this manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true # Render will auto-generate a secure value
+      - key: CLIENT_URL
+        sync: false # Set to your Netlify URL
+      - key: FRONTEND_URL
+        sync: false # Set to your Netlify URL
+      # Optional email configuration
+      # - key: EMAIL_USER
+      #   sync: false
+      # - key: EMAIL_PASS
+      #   sync: false
+
+# To deploy using this file:
+# 1. Push this file to your repository
+# 2. Go to Render Dashboard
+# 3. Click "New" -> "Blueprint"
+# 4. Connect your repository
+# 5. Render will read this file and create the service
+# 6. Manually set MONGODB_URI, CLIENT_URL, and FRONTEND_URL in the dashboard
+

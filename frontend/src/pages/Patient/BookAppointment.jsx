@@ -4,6 +4,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MobileNavbar from "../../components/MobileNavbar";
 import PatientHomeButton from "../../components/PatientHomeButton";
+import API_URL from "../../config/api";
 
 export default function BookAppointment() {
   const [form, setForm] = useState({
@@ -29,7 +30,7 @@ export default function BookAppointment() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/doctors/public");
+        const res = await axios.get(`${API_URL}/api/doctors/public`);
         setDoctors(res.data);
       } catch (err) {
         console.error("❌ Gabim në marrjen e mjekëve:", err);
@@ -66,8 +67,8 @@ export default function BookAppointment() {
     setLoadingServices(true);
     try {
       const [servicesRes, hoursRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/doctors/${doctorId}/services`), // Vetëm shërbimet e doktorit
-        axios.get(`http://localhost:5000/api/working-hours/${doctorId}`),
+        axios.get(`${API_URL}/api/doctors/${doctorId}/services`), // Vetëm shërbimet e doktorit
+        axios.get(`${API_URL}/api/working-hours/${doctorId}`),
       ]);
       setServices(servicesRes.data);
       setWorkingHours(hoursRes.data);
@@ -83,7 +84,7 @@ export default function BookAppointment() {
   const fetchTakenTimes = async (doctorId, date) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/appointments/taken?doctorId=${doctorId}&date=${date}`
+        `${API_URL}/api/appointments/taken?doctorId=${doctorId}&date=${date}`
       );
       setTakenTimes(res.data);
     } catch (err) {
@@ -187,7 +188,7 @@ export default function BookAppointment() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/appointments", form, {
+      await axios.post(`${API_URL}/api/appointments`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

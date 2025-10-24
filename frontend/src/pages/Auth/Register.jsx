@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import API_URL from "../../config/api";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+      const res = await axios.post(`${API_URL}/api/auth/register`, formData);
       if (formData.role === "patient" && res.data.message.includes("Verifikoni")) {
         setVerificationStep(true);
       } else {
@@ -66,7 +67,7 @@ export default function Register() {
   const verifyCode = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/verify-email", {
+      const res = await axios.post(`${API_URL}/api/auth/verify-email`, {
         email: formData.email,
         code: verificationCode,
       });
@@ -79,7 +80,7 @@ export default function Register() {
 
   const resendCode = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/resend-verification", {
+      const res = await axios.post(`${API_URL}/api/auth/resend-verification`, {
         email: formData.email,
       });
       setResendMessage("📧 " + res.data.message);

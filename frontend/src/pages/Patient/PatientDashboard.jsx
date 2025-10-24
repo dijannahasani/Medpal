@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Dashboard.css";
 import MobileNavbar from "../../components/MobileNavbar";
 import { clearAuth, getToken } from "../../utils/auth";
+import API_URL from "../../config/api";
 
 export default function PatientDashboard() {
   const [user, setUser] = useState({});
@@ -18,7 +19,7 @@ export default function PatientDashboard() {
           navigate("/login");
           return;
         }
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${API_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);

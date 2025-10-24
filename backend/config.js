@@ -1,8 +1,8 @@
 // Database configuration
 const config = {
-  // Use MongoDB Atlas connection string
-  // Support both MONGODB_URI and MONGO_URI for flexibility
-  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb+srv://username:password@cluster.mongodb.net/medpal?retryWrites=true&w=majority",
+  // Use MongoDB Atlas connection string (must be set in environment for production)
+  // Support both MONGODB_URI and MONGO_URI for flexibility. No hard-coded credentials in repo.
+  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || "",
   
   // JWT Secret
   JWT_SECRET: process.env.JWT_SECRET || "medpal_super_secret_key_2024",
