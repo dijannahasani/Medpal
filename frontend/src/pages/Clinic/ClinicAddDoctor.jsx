@@ -13,6 +13,7 @@ export default function ClinicAddDoctor() {
     departmentId: "",
     services: [],
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [departments, setDepartments] = useState([]);
   const [clinicServices, setClinicServices] = useState([]);
@@ -73,6 +74,8 @@ export default function ClinicAddDoctor() {
     e.preventDefault();
     console.log("🔍 Form submitted with data:", formData);
     
+    setIsSubmitting(true);
+    
     const token = getToken();
     console.log("🔍 Token exists:", !!token);
 
@@ -98,6 +101,8 @@ export default function ClinicAddDoctor() {
       console.error("❌ Status:", err.response?.status);
       const message = err.response?.data?.message || "Gabim gjatë shtimit të mjekut.";
       alert("❌ " + message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -267,17 +272,21 @@ export default function ClinicAddDoctor() {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-lg w-100 clinic-add-submit" style={{
-                    background: "linear-gradient(135deg, #D9A299, #DCC5B2)",
-                    border: "none",
-                    color: "white",
-                    borderRadius: "15px",
-                    boxShadow: "0 8px 25px rgba(217, 162, 153, 0.4)",
-                    padding: "0.6rem 0.9rem",
-                    fontSize: "1rem",
-                    fontWeight: "700",
-                    transition: "all 0.3s ease",
-                    display: 'flex',
+                  <button 
+                    type="submit" 
+                    className="btn btn-lg w-100 clinic-add-submit" 
+                    disabled={isSubmitting}
+                    style={{
+                      background: isSubmitting ? "#ccc" : "linear-gradient(135deg, #D9A299, #DCC5B2)",
+                      border: "none",
+                      color: "white",
+                      borderRadius: "15px",
+                      boxShadow: "0 8px 25px rgba(217, 162, 153, 0.4)",
+                      padding: "0.6rem 0.9rem",
+                      fontSize: "1rem",
+                      fontWeight: "700",
+                      transition: "all 0.3s ease",
+                      display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
@@ -291,8 +300,17 @@ export default function ClinicAddDoctor() {
                     }}>
                     {/* Use inline styles on the label spans to ensure they take effect even if external CSS overrides exist. */}
                     <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1, whiteSpace: 'normal', textAlign: 'center' }}>
-                      <span style={{ display: 'block', fontSize: '1.05rem', lineHeight: '1.05rem', padding: '0', margin: '0' }}>➕ Shto</span>
-                      <span style={{ display: 'block', fontSize: '0.95rem', lineHeight: '1rem', marginTop: '2px' }}>Mjekun</span>
+                      {isSubmitting ? (
+                        <>
+                          <span style={{ display: 'block', fontSize: '1.05rem', lineHeight: '1.05rem', padding: '0', margin: '0' }}>⏳ Duke</span>
+                          <span style={{ display: 'block', fontSize: '0.95rem', lineHeight: '1rem', marginTop: '2px' }}>Regjistruar</span>
+                        </>
+                      ) : (
+                        <>
+                          <span style={{ display: 'block', fontSize: '1.05rem', lineHeight: '1.05rem', padding: '0', margin: '0' }}>➕ Shto</span>
+                          <span style={{ display: 'block', fontSize: '0.95rem', lineHeight: '1rem', marginTop: '2px' }}>Mjekun</span>
+                        </>
+                      )}
                     </span>
                   </button>
                 </form>
