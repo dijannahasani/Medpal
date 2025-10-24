@@ -74,20 +74,11 @@ export default function ClinicAddDoctor() {
     const token = getToken();
 
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register-doctor`, formData, {
+      await axios.post(`${API_URL}/api/auth/register-doctor`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const { doctor } = response.data;
-      
-      alert(
-        `✅ Mjeku u shtua me sukses!\n\n` +
-        `📧 Email: ${doctor.email}\n` +
-        `🔑 Password: ${doctor.password}\n` +
-        `👨‍⚕️ Doctor Code: ${doctor.doctorCode}\n\n` +
-        `⚠️ Kopjo këto kredenciale dhe dërgoja te mjeku!`
-      );
-      
+      alert("✅ Mjeku u shtua me sukses! Kredencialet u dërguan në email.");
       setFormData({
         name: "",
         email: "",

@@ -238,12 +238,7 @@ router.post("/register-doctor", verifyToken, async (req, res) => {
 
     await newDoctor.save();
 
-    // Try to send email but don't fail if it doesn't work
-    try {
-      await sendDoctorWelcomeEmail(email, doctorCode, password);
-    } catch (emailError) {
-      console.log("⚠️ Email nuk u dërgua, por mjeku u krijua:", emailError.message);
-    }
+    await sendDoctorWelcomeEmail(email, doctorCode, password);
 
     res.status(201).json({
       message: "✅ Mjeku u regjistrua me sukses!",
@@ -251,7 +246,6 @@ router.post("/register-doctor", verifyToken, async (req, res) => {
         name: newDoctor.name,
         email: newDoctor.email,
         doctorCode: newDoctor.doctorCode,
-        password: password, // Return password for manual sharing
       },
     });
   } catch (err) {
