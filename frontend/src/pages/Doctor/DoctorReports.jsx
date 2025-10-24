@@ -30,7 +30,7 @@ export default function DoctorReports() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/api/reports/${reportId}/pdf`, {
-        responseType: `blob",
+        responseType: "blob",
         headers: { Authorization: `Bearer ${token}` },
       });
 

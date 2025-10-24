@@ -30,10 +30,10 @@ export default function DoctorAppointments() {
   };
 
   const downloadPDF = async (id) => {
-    const token = localStorage.getItem(`token");
+    const token = localStorage.getItem("token");
     const res = await axios.get(`${API_URL}/api/appointments/${id}/pdf`, {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: `blob",
+      responseType: "blob",
     });
     const blob = new Blob([res.data], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);

@@ -28,7 +28,7 @@ export default function ClinicPatientReports() {
       });
       setRaportet(res.data);
     } catch (err) {
-      console.error(`❌ Gabim në marrjen e raporteve të klinikës:", err);
+      console.error("❌ Gabim në marrjen e raporteve të klinikës:", err);
     }
   };
 
@@ -75,7 +75,7 @@ export default function ClinicPatientReports() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/api/reports/${reportId}/pdf`, {
-        responseType: `blob",
+        responseType: "blob",
         headers: { Authorization: `Bearer ${token}` },
       });
 

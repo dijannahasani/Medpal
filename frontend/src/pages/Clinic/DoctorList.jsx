@@ -67,7 +67,7 @@ export default function DoctorList() {
       });
       fetchDoctors();
     } catch (err) {
-      console.error(`❌ Gabim gjatë fshirjes:", err);
+      console.error("❌ Gabim gjatë fshirjes:", err);
     }
   };
 
@@ -108,7 +108,7 @@ export default function DoctorList() {
       setEditingDoctor(null);
       fetchDoctors();
     } catch (err) {
-      console.error(`❌ Gabim gjatë ruajtjes së mjekut:", err);
+      console.error("❌ Gabim gjatë ruajtjes së mjekut:", err);
     }
   };
 
