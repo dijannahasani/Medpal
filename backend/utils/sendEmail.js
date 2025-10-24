@@ -74,7 +74,7 @@ async function sendDoctorWelcomeEmail(email, doctorCode, password) {
       <p>Jeni regjistruar me sukses në platformën MedPal.</p>
       <p><strong>Doctor Code:</strong> ${doctorCode}</p>
       <p><strong>Password:</strong> ${password}</p>
-      <p>Mund të kyçeni këtu: <a href="${process.env.CLIENT_URL}/login-doctor">Login Doctor</a></p>
+      <p>Mund të kyçeni këtu: <a href="${process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://medpal-app.netlify.app'}/login-doctor">Login Doctor</a></p>
       ${footer()}
     `,
   };
