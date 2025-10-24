@@ -5,7 +5,7 @@ const crypto = require("crypto");
 
 const verifyToken = require("../middleware/verifyToken");
 const User = require("../models/User");
-const sendVerificationEmail = require("../utils/sendEmail");
+const { sendVerificationEmail } = require("../utils/sendEmail");
 
 // 📥 Merr të dhënat e profilit të kyçur
 router.get("/me", verifyToken, async (req, res) => {

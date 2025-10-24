@@ -4,19 +4,27 @@ require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 const express = require("express");
 const cors = require("cors");
 const os = require("os");
+const fs = require("fs");
+
+// ✅ Log loaded routes
+const routeDir = path.join(__dirname, "routes");
+fs.readdirSync(routeDir).forEach((f) => console.log("🛠 Loading route:", f));
 
 // ✅ CREATE APP
 const app = express();
 
-// ✅ SECURE: Remove this (don’t disable TLS verification)
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// ✅ SAFETY: Global uncaught exception handler
+process.on("uncaughtException", (err) => {
+  console.error("💥 Uncaught Exception:", err);
+  console.error(err.stack);
+});
 
 // ✅ CORS CONFIGURATION
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:5173", // Vite default
-  "http://localhost:5174", // alternate Vite port
-  "http://localhost:4173", // Vite preview
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:4173",
   process.env.FRONTEND_URL,
   process.env.CLIENT_URL,
   process.env.NETLIFY_PREVIEW_ORIGIN,
@@ -25,22 +33,19 @@ const allowedOrigins = [
 // Matches any localhost origin with any port
 const localhostRegex = /^http:\/\/localhost(?::\d+)?$/i;
 
-// ✅ Dual-mode dynamic CORS logic
+// ✅ Dynamic CORS Logic
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests without origin (Postman, mobile apps, server-to-server)
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // Allow Postman or mobile apps
 
     const isLocalhost = localhostRegex.test(origin);
     const isAllowed = allowedOrigins.includes(origin) || isLocalhost;
 
-    // In production, only allow FRONTEND_URL explicitly (Render or Netlify)
     if (process.env.NODE_ENV === "production" && !isAllowed) {
       console.warn("🚫 Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS: " + origin));
     }
 
-    // Otherwise, allow during dev or local testing
     if (isAllowed || process.env.NODE_ENV !== "production") {
       return callback(null, true);
     }
@@ -55,36 +60,24 @@ const corsOptions = {
 
 // ✅ Apply CORS middleware globally
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+
+// ✅ Fix for Express 5: use RegExp for catch-all preflight
+// "*" and "(.*)" are invalid path strings in path-to-regexp v6
+app.options(/.*/, cors(corsOptions));
+
+// ✅ Parse JSON
 app.use(express.json());
 
 // ✅ ROUTES
-const userRoutes = require("./routes/users");
-app.use("/api/users", userRoutes);
-
-const authRoutes = require("./routes/auth");
-app.use("/api/auth", authRoutes);
-
-const appointmentRoutes = require("./routes/appointments");
-app.use("/api/appointments", appointmentRoutes);
-
-const doctorRoutes = require("./routes/doctors");
-app.use("/api/doctors", doctorRoutes);
-
-const reportRoutes = require("./routes/reports");
-app.use("/api/reports", reportRoutes);
-
+app.use("/api/users", require("./routes/users"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/appointments", require("./routes/appointments"));
+app.use("/api/doctors", require("./routes/doctors"));
+app.use("/api/reports", require("./routes/reports"));
 app.use("/uploads", express.static("uploads"));
-
-const documentRoutes = require("./routes/documents");
-app.use("/api/documents", documentRoutes);
-
-const workingHoursRoutes = require("./routes/workingHours");
-app.use("/api/working-hours", workingHoursRoutes);
-
-const adminRoutes = require("./routes/admin");
-app.use("/api/admin", adminRoutes);
-
+app.use("/api/documents", require("./routes/documents"));
+app.use("/api/working-hours", require("./routes/workingHours"));
+app.use("/api/admin", require("./routes/admin"));
 app.use("/api/clinic", require("./routes/clinic"));
 
 // ✅ CONNECT TO MONGODB
@@ -136,9 +129,7 @@ function getLocalIPv4() {
   const ifaces = os.networkInterfaces();
   for (const name of Object.keys(ifaces)) {
     for (const iface of ifaces[name]) {
-      if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address;
-      }
+      if (iface.family === "IPv4" && !iface.internal) return iface.address;
     }
   }
   return null;
@@ -156,14 +147,13 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at ${localUrl}`);
   if (lanUrl) console.log(`📶 LAN: ${lanUrl}`);
 
-  const supportsOsc8 =
-    !!process.env.VSCODE_PID || process.env.TERM_PROGRAM === "vscode";
+  const supportsOsc8 = !!process.env.VSCODE_PID || process.env.TERM_PROGRAM === "vscode";
   if (supportsOsc8) {
     try {
       console.log(osc8Link(localUrl, `Open ${localUrl}`));
       if (lanUrl) console.log(osc8Link(lanUrl, `Open ${lanUrl}`));
-    } catch (e) {
-      // ignore
+    } catch {
+      /* ignore */
     }
   }
 });
