@@ -1,56 +1,80 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const express = require('express');
-const cors = require('cors');
-const os = require('os');
+// ✅ ENV & DEPENDENCIES
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+const express = require("express");
+const cors = require("cors");
+const os = require("os");
 
-// ✅ KRIJIMI I APP
+// ✅ CREATE APP
 const app = express();
 
-// ✅ MIDDLEWARE
-// Configure CORS for production
+// ✅ SECURE: Remove this (don’t disable TLS verification)
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+// ✅ CORS CONFIGURATION
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173', // Vite default port
+  "http://localhost:3000",
+  "http://localhost:5173", // Vite default
+  "http://localhost:5174", // alternate Vite port
+  "http://localhost:4173", // Vite preview
   process.env.FRONTEND_URL,
-  process.env.CLIENT_URL
+  process.env.CLIENT_URL,
+  process.env.NETLIFY_PREVIEW_ORIGIN,
 ].filter(Boolean);
 
+// Matches any localhost origin with any port
+const localhostRegex = /^http:\/\/localhost(?::\d+)?$/i;
+
+// ✅ Dual-mode dynamic CORS logic
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    // Allow requests without origin (Postman, mobile apps, server-to-server)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+
+    const isLocalhost = localhostRegex.test(origin);
+    const isAllowed = allowedOrigins.includes(origin) || isLocalhost;
+
+    // In production, only allow FRONTEND_URL explicitly (Render or Netlify)
+    if (process.env.NODE_ENV === "production" && !isAllowed) {
+      console.warn("🚫 Blocked by CORS:", origin);
+      return callback(new Error("Not allowed by CORS: " + origin));
     }
+
+    // Otherwise, allow during dev or local testing
+    if (isAllowed || process.env.NODE_ENV !== "production") {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS: " + origin));
   },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
+
+// ✅ Apply CORS middleware globally
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 // ✅ ROUTES
-const userRoutes = require('./routes/users');
-app.use('/api/users', userRoutes);
+const userRoutes = require("./routes/users");
+app.use("/api/users", userRoutes);
 
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
 
 const appointmentRoutes = require("./routes/appointments");
 app.use("/api/appointments", appointmentRoutes);
 
 const doctorRoutes = require("./routes/doctors");
-app.use("/api/doctors", doctorRoutes); // ✅ Rregulluar
+app.use("/api/doctors", doctorRoutes);
 
 const reportRoutes = require("./routes/reports");
 app.use("/api/reports", reportRoutes);
 
-app.use("/uploads", express.static("uploads")); // për të shfaqur dokumentet
+app.use("/uploads", express.static("uploads"));
 
 const documentRoutes = require("./routes/documents");
 app.use("/api/documents", documentRoutes);
@@ -64,25 +88,21 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/clinic", require("./routes/clinic"));
 
 // ✅ CONNECT TO MONGODB
-const connectDB = require('./database');
+const connectDB = require("./database");
 
-// Initialize database connection
 const initializeApp = async () => {
   await connectDB();
-  
-  // Start reminder job after DB connection is established
   require("./reminderJob");
-  
-  console.log('🔄 All services initialized successfully');
+  console.log("🔄 All services initialized successfully");
 };
 
-initializeApp().catch(err => {
-  console.error('❌ Failed to initialize application:', err);
+initializeApp().catch((err) => {
+  console.error("❌ Failed to initialize application:", err);
   process.exit(1);
 });
 
-// ✅ TEST ROUTE - prettier HTML so the status is visible
-app.get('/', (req, res) => {
+// ✅ TEST ROUTE
+app.get("/", (req, res) => {
   res.send(`
     <!doctype html>
     <html>
@@ -111,12 +131,12 @@ app.get('/', (req, res) => {
 
 // ✅ START SERVER
 const PORT = process.env.PORT || 5000;
-// helper: get first non-internal IPv4 address (for LAN access)
+
 function getLocalIPv4() {
   const ifaces = os.networkInterfaces();
   for (const name of Object.keys(ifaces)) {
     for (const iface of ifaces[name]) {
-      if (iface.family === 'IPv4' && !iface.internal) {
+      if (iface.family === "IPv4" && !iface.internal) {
         return iface.address;
       }
     }
@@ -124,7 +144,6 @@ function getLocalIPv4() {
   return null;
 }
 
-// helper: OSC 8 hyperlink (only enable on terminals that likely support it)
 function osc8Link(url, label) {
   return `\u001b]8;;${url}\u0007${label}\u001b]8;;\u0007`;
 }
@@ -134,21 +153,17 @@ app.listen(PORT, () => {
   const ip = getLocalIPv4();
   const lanUrl = ip ? `http://${ip}:${PORT}` : null;
 
-  // Print a plain URL (most terminals auto-link http/https)
   console.log(`🚀 Server running at ${localUrl}`);
-
-  // If we have a LAN address, print it too (useful to touch from another device)
   if (lanUrl) console.log(`📶 LAN: ${lanUrl}`);
 
-  // If running inside VS Code integrated terminal, try OSC 8 hyperlink for a nicer clickable label.
-  const supportsOsc8 = !!process.env.VSCODE_PID || process.env.TERM_PROGRAM === 'vscode';
+  const supportsOsc8 =
+    !!process.env.VSCODE_PID || process.env.TERM_PROGRAM === "vscode";
   if (supportsOsc8) {
     try {
       console.log(osc8Link(localUrl, `Open ${localUrl}`));
       if (lanUrl) console.log(osc8Link(lanUrl, `Open ${lanUrl}`));
     } catch (e) {
-      // ignore if terminal doesn't support it
+      // ignore
     }
   }
 });
-

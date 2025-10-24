@@ -43,16 +43,40 @@ router.post("/", verifyToken, async (req, res) => {
     const workingHours = doctor.workingHours;
     if (!workingHours) return res.status(400).json({ message: "Mjeku nuk ka orar të caktuar." });
 
-  // Compute weekday in a stable way (avoid locale surprises)
-  const dayIdx = new Date(date + 'T00:00:00').getDay(); // 0=Sun..6=Sat
-  const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-  const dayName = days[dayIdx];
-    const daySchedule = workingHours[dayName];
+    // Compute weekday in a timezone-safe way using UTC to avoid off-by-one day issues
+    // and compare times numerically (minutes) instead of string comparison.
+    const toMinutes = (t) => {
+      if (!t || typeof t !== 'string') return null;
+      const m = t.split(":");
+      if (m.length !== 2) return null;
+      const hh = parseInt(m[0], 10);
+      const mm = parseInt(m[1], 10);
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+      return hh * 60 + mm;
+    };
 
+    const utcDate = new Date(date + 'T00:00:00Z');
+    const dayIdx = utcDate.getUTCDay(); // 0=Sun..6=Sat
+    const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+    const dayName = days[dayIdx];
+    const daySchedule = workingHours && workingHours[dayName];
+
+    // If schedule is missing, return a clear message. (If you prefer to allow
+    // bookings even when a schedule is not set, we can change this behaviour.)
     if (!daySchedule || !daySchedule.start || !daySchedule.end) {
       return res.status(400).json({ message: `Mjeku nuk punon të ${dayName}.` });
     }
-    if (time < daySchedule.start || time > daySchedule.end) {
+
+    const startMin = toMinutes(daySchedule.start);
+    const endMin = toMinutes(daySchedule.end);
+    const requestedMin = toMinutes(time);
+
+    if (startMin === null || endMin === null || requestedMin === null) {
+      return res.status(400).json({ message: 'Format i pavlefshëm i kohës. Përdorni HH:mm.' });
+    }
+
+    // allow booking inside the half-open interval [start, end)
+    if (requestedMin < startMin || requestedMin >= endMin) {
       return res.status(400).json({ message: `Orari i mjekut është nga ${daySchedule.start} deri në ${daySchedule.end}.` });
     }
 
@@ -178,13 +202,29 @@ router.put("/:id/status", verifyToken, async (req, res) => {
     }
 
     if (status === "approved") {
-      const workingHours = appointment.doctorId.workingHours;
-      const dayIdx = new Date(appointment.date + 'T00:00:00').getDay();
-      const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-      const dayName = days[dayIdx];
-      const schedule = workingHours?.[dayName];
+        const workingHours = appointment.doctorId.workingHours;
+        // Use the same robust time/day calculations as when booking.
+        const toMinutes = (t) => {
+          if (!t || typeof t !== 'string') return null;
+          const m = t.split(":");
+          if (m.length !== 2) return null;
+          const hh = parseInt(m[0], 10);
+          const mm = parseInt(m[1], 10);
+          if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+          return hh * 60 + mm;
+        };
 
-      const outOfHours = (!schedule || !schedule.start || !schedule.end || appointment.time < schedule.start || appointment.time > schedule.end);
+        const utcDate = new Date(appointment.date + 'T00:00:00Z');
+        const dayIdx = utcDate.getUTCDay();
+        const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+        const dayName = days[dayIdx];
+        const schedule = workingHours?.[dayName];
+
+        const startMin = toMinutes(schedule?.start);
+        const endMin = toMinutes(schedule?.end);
+        const apptMin = toMinutes(appointment.time);
+
+        const outOfHours = (!schedule || startMin === null || endMin === null || apptMin === null || apptMin < startMin || apptMin >= endMin);
       if (outOfHours) {
         if (req.user.role === "clinic") {
           return res.status(400).json({

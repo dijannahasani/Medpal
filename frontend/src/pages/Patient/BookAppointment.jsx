@@ -109,10 +109,11 @@ export default function BookAppointment() {
 
   const currentDaySchedule = () => {
     if (!form.date || !workingHours) return null;
-    const weekday = new Date(form.date).toLocaleDateString("en-US", {
-      weekday: "long",
-    }).toLowerCase();
-    const schedule = workingHours[weekday] || null;
+    // Compute weekday using UTC to avoid off-by-one issues caused by timezone shifts
+    const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+    const utcDate = new Date(form.date + "T00:00:00Z");
+    const weekday = days[utcDate.getUTCDay()];
+    const schedule = workingHours?.[weekday] || null;
     // Only return a schedule if both start and end are present and non-empty
     if (!schedule || !schedule.start || !schedule.end) return null;
     return schedule;
@@ -121,11 +122,9 @@ export default function BookAppointment() {
   const isSelectedDateToday = () => {
     if (!form.date) return false;
     try {
-      const selectedDate = new Date(form.date);
-      const today = new Date();
-      const selectedYMD = selectedDate.toISOString().split("T")[0];
-      const todayYMD = today.toISOString().split("T")[0];
-      return selectedYMD === todayYMD;
+      // Compare in local time to match the user's calendar expectations
+      const todayLocalYMD = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      return form.date === todayLocalYMD;
     } catch (err) {
       return false;
     }
