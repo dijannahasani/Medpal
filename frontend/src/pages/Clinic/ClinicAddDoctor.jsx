@@ -71,13 +71,18 @@ export default function ClinicAddDoctor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("🔍 Form submitted with data:", formData);
+    
     const token = getToken();
+    console.log("🔍 Token exists:", !!token);
 
     try {
-      await axios.post(`${API_URL}/api/auth/register-doctor`, formData, {
+      console.log("🚀 Sending request to:", `${API_URL}/api/auth/register-doctor`);
+      const response = await axios.post(`${API_URL}/api/auth/register-doctor`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      
+      console.log("✅ Response received:", response.data);
       alert("✅ Mjeku u shtua me sukses! Kredencialet iu dërguan në email.");
       
       setFormData({
@@ -89,6 +94,8 @@ export default function ClinicAddDoctor() {
       });
     } catch (err) {
       console.error("❌ Gabim gjatë regjistrimit të mjekut:", err);
+      console.error("❌ Response data:", err.response?.data);
+      console.error("❌ Status:", err.response?.status);
       const message = err.response?.data?.message || "Gabim gjatë shtimit të mjekut.";
       alert("❌ " + message);
     }
